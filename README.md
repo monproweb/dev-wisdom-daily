@@ -1,6 +1,6 @@
 # Developer Motivational Quote Twitter Bot
 
-This is a Twitter bot that generates and tweets a motivational quote for developers along with an image based on the description provided by the quote.
+This is a Twitter bot that generates and tweets developer quotes along with an image based on the description provided by the quote.
 
 ## Technologies Used
 
@@ -30,7 +30,7 @@ To set up this project locally, you will need to:
 
 ## Usage
 
-Once the project is set up, the bot will automatically tweet a new motivational quote with an image at the specified intervals set up in the Cloud Scheduler job.
+Once the project is set up, the bot will automatically tweet a new developer quote with an image at the specified intervals set up in the Cloud Scheduler job.
 
 ## Contributing
 
