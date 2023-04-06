@@ -1,4 +1,4 @@
-# Developer Motivational Quote Twitter Bot
+# Developer Quote Twitter Bot
 
 This is a Twitter bot that generates and tweets developer quotes along with an image based on the description provided by the quote.
 
