@@ -21,7 +21,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 def generate_quote():
     chat_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Give me an existing quote from a developer. Don't include quotation marks. You can use emojis."},
+        {"role": "user", "content": "Give me an existing quote from a developer with his name. Include 1-2 related hashtags for Twitter. Be conversational. Keep your copy short and sweet. You can use emojis. Your answer should be formatted starting with the quote followed by the name and be conversational at the end."},
     ]
 
     response = openai.ChatCompletion.create(
