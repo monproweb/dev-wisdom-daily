@@ -2,6 +2,7 @@ import os
 import openai
 import tweepy
 import requests
+import re
 from io import BytesIO
 
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
@@ -70,8 +71,46 @@ def upload_media(url):
     return media.media_id_string
 
 
+def extract_quote_from_tweet(tweet):
+    match = re.search(r'"(.*?)"', tweet)
+    return match.group(0) if match else ""
+
+
+def get_all_previous_tweets():
+    all_tweets = []
+    max_id = None
+
+    while True:
+        tweets = api.user_timeline(
+            screen_name="@DevWisdomDaily", count=200, tweet_mode="extended", max_id=max_id)
+        if not tweets:
+            break
+
+        all_tweets.extend(tweets)
+        max_id = tweets[-1].id - 1
+
+    return [tweet.full_text for tweet in all_tweets]
+
+
+def get_previous_quotes():
+    previous_tweets = get_all_previous_tweets()
+    return [extract_quote_from_tweet(tweet) for tweet in previous_tweets]
+
+
+def generate_unique_quote(previous_quotes):
+    quote = ""
+    detailed_description = ""
+    while True:
+        quote, detailed_description = generate_quote()
+        quote_text = extract_quote_from_tweet(quote)
+        if quote_text not in previous_quotes:
+            break
+    return quote, detailed_description
+
+
 def tweet_quote_and_image():
-    quote, detailed_description = generate_quote()
+    previous_quotes = get_previous_quotes()
+    quote, detailed_description = generate_unique_quote(previous_quotes)
     print("Generated quote:", quote)
     print("Generated detailed description:", detailed_description)
 
