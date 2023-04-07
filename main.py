@@ -35,9 +35,10 @@ def generate_quote():
     )
 
     quote = response.choices[0].message['content'].strip()
+    quote_text = extract_quote_from_tweet(quote)
 
     chat_messages.append(
-        {"role": "user", "content": f"Describe the quote '{quote}' visually with detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote."})
+        {"role": "user", "content": f"Describe the quote '{quote_text}' visually with detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote."})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=chat_messages,
