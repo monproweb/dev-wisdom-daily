@@ -37,7 +37,7 @@ def generate_quote():
     quote = response.choices[0].message['content'].strip()
 
     chat_messages.append(
-        {"role": "user", "content": f"Describe the quote '{quote}' visually with detailed elements for generating an image WITHOUT any text on the image."})
+        {"role": "user", "content": f"Describe the quote '{quote}' visually with detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote."})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=chat_messages,
