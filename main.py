@@ -103,7 +103,7 @@ def generate_unique_quote(previous_quotes):
     while True:
         quote, detailed_description = generate_quote()
         quote_text = extract_quote_from_tweet(quote)
-        if quote_text not in previous_quotes:
+        if quote_text not in previous_quotes and len(quote) <= 280:
             break
     return quote, detailed_description
 
