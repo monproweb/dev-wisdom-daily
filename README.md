@@ -11,6 +11,12 @@ This is a Twitter bot that generates and tweets developer quotes along with an i
 - [Google Cloud Pub/Sub](https://cloud.google.com/pubsub)
 - [Python](https://www.python.org/)
 
+## Prerequisites
+
+- Python 3.10 or higher
+- A Twitter Developer account with API keys and access tokens
+- An OpenAI API key
+
 ## Setup
 
 To set up this project locally, you will need to:
@@ -18,11 +24,11 @@ To set up this project locally, you will need to:
 1. Clone this repository: `git clone https://github.com/monproweb/dev-wisdom-daily.git`
 2. Install the required packages using pip: `pip install -r requirements.txt`
 3. Set the necessary environment variables:
-   - `TWITTER_API_KEY`
+   - `TWITTER_API_KEY` (Follow the [official documentation](https://developer.twitter.com/en/docs/authentication/oauth-1-0a) to create a Twitter Developer account and obtain API keys and access tokens)
    - `TWITTER_API_SECRET`
    - `TWITTER_ACCESS_TOKEN`
    - `TWITTER_ACCESS_TOKEN_SECRET`
-   - `OPENAI_API_KEY`
+   - `OPENAI_API_KEY` (Follow the [official documentation](https://beta.openai.com/docs/developer-quickstart) to obtain an OpenAI API key)
 4. Deploy the function to Google Cloud Functions
 5. Create a topic in Google Cloud Pub/Sub
 6. Create a subscription for the topic
