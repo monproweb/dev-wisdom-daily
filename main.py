@@ -35,14 +35,15 @@ def setup_tweepy_api():
     return tweepy.API(auth, wait_on_rate_limit=True)
 
 
-def generate_quote_and_image_description():
+def generate_quote():
     """
     Generates a developer quote and image description using OpenAI GPT-3.5 Turbo.
-    Returns a tuple containing the generated quote and image description.
+    Returns a tuple containing the generated quote formatted for a tweet, and
+    a detailed description for generating an image using DALL-E 2.
     """
     chat_messages = [
-        {"role": "system", "content": "You are a helpful assistant, specializing in generating engaging Tweets about developer quotes, creating image descriptions for DALL-E 2, and ensuring the Tweets follow the guidelines of being under 280 characters with 1-2 relevant hashtags."},
-        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name."},
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters, formatted starting with the quote followed by the name and be conversational at the end."},
     ]
 
     response = openai.ChatCompletion.create(
@@ -53,14 +54,11 @@ def generate_quote_and_image_description():
         temperature=0.7,
     )
 
-    quote_and_author = response.choices[0].message['content'].strip()
-    quote_text, author = quote_and_author.split(" - ", 1)
+    quote = response.choices[0].message['content'].strip()
+    quote_text = extract_quote_from_tweet(quote)
 
-    chat_messages.extend([
-        {"role": "user", "content": f"Include 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters, formatted starting with the quote followed by the name and be conversational at the end. The quote is: '{quote_text}' by {author}."},
-        {"role": "user", "content": f"Describe the quote '{quote_text}' visually with detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote."},
-    ])
-
+    chat_messages.append(
+        {"role": "user", "content": f"Describe the quote '{quote_text}' visually with detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote."})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=chat_messages,
@@ -69,9 +67,8 @@ def generate_quote_and_image_description():
         temperature=0.7,
     )
 
-    reply = response.choices[0].message['content'].strip()
-    quote, detailed_description = reply.split('\n\n', 1)
-    return quote.strip(), detailed_description.strip()
+    detailed_description = response.choices[0].message['content'].strip()
+    return quote, detailed_description
 
 
 def truncate_string(string, max_length):
@@ -117,7 +114,7 @@ def extract_quote_from_tweet(tweet):
     Returns the extracted quote.
     """
     match = re.search(r'"(.*?)"', tweet)
-    return match.group(1) if match else ""
+    return match.group(0) if match else ""
 
 
 def get_previous_quotes(API):
@@ -162,7 +159,7 @@ def generate_unique_quote(previous_quotes):
     quote = ""
     detailed_description = ""
     while True:
-        quote, detailed_description = generate_quote_and_image_description()
+        quote, detailed_description = generate_quote()
         quote_text = extract_quote_from_tweet(quote)
         if quote_text not in previous_quotes and len(quote) <= 280:
             break
