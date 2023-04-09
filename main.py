@@ -42,7 +42,7 @@ def generate_quote_and_image_description():
     """
     chat_messages = [
         {"role": "system", "content": "You are a helpful assistant, specializing in generating engaging Tweets about developer quotes, creating image descriptions for DALL-E 2, and ensuring the Tweets follow the guidelines of being under 280 characters with 1-2 relevant hashtags."},
-        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Compose a Tweet with the quote and name, and make sure to include 1-2 relevant hashtags. Keep the Tweet concise, under 280 characters, and add an emoji or a playful tone to make it engaging. Format the Tweet by starting with the quote in double quotes, followed by the name, and then the hashtags and any additional conversational elements. Also, create an abstract visual representation of the idea behind the quote. Design an image without any text, focusing on relevant symbols, shapes, and colors to convey the essence of the quote. Emphasize the key concepts and emotions connected to the quote in the image."},
+        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Compose a Tweet with the quote and name, and make sure to include 1-2 relevant hashtags. Keep the Tweet concise, under 280 characters, and add an emoji or a playful tone to make it engaging. Format the Tweet by starting with the quote in double quotes, followed by the name, and then the hashtags and any additional conversational elements. Additionally, create an abstract visual representation of the idea behind the quote itself without considering any additional information from the Tweet. Design an image without any text, focusing on relevant symbols, shapes, and colors to convey the essence of the quote. Emphasize the key concepts and emotions connected to the quote in the image."},
     ]
 
     response = openai.ChatCompletion.create(
@@ -116,7 +116,7 @@ def get_previous_quotes(API):
         tweet_mode="extended",
     ).items()
 
-    return [extract_quote_from_tweet(tweet) for tweet in all_tweets]
+    return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
 
 def tweet_quote_and_image(API):
