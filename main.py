@@ -42,8 +42,24 @@ def generate_quote_and_image_description():
     """
     chat_messages = [
         {"role": "system", "content": "You are a helpful assistant, specializing in generating engaging Tweets about developer quotes, creating image descriptions for DALL-E 2, and ensuring the Tweets follow the guidelines of being under 280 characters with 1-2 relevant hashtags."},
-        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Compose a Tweet with the quote and name, and make sure to include 1-2 relevant hashtags. Keep the Tweet concise, under 280 characters, and add an emoji or a playful tone to make it engaging. Format the Tweet by starting with the quote in double quotes, followed by the name, and then the hashtags and any additional conversational elements. Also, create a detailed description of an image that visually represents the idea behind the quote without any text. The image should focus on relevant symbols, shapes, and colors to convey the essence of the quote. Emphasize the key concepts and emotions connected to the quote in the image."},
+        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name."},
     ]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=chat_messages,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
+
+    quote_and_author = response.choices[0].message['content'].strip()
+    quote_text, author = quote_and_author.split(" - ", 1)
+
+    chat_messages.extend([
+        {"role": "user", "content": f"Include 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters, formatted starting with the quote followed by the name and be conversational at the end. The quote is: '{quote_text}' by {author}."},
+        {"role": "user", "content": f"Describe the quote '{quote_text}' visually with detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote."},
+    ])
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
