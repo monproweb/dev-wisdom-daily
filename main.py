@@ -43,7 +43,7 @@ def generate_quote():
     """
     chat_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
+        {"role": "user", "content": "Provide an existing quote from a well-known software developer, programmer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
     ]
 
     response = openai.ChatCompletion.create(
