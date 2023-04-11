@@ -4,6 +4,7 @@ import tweepy
 import requests
 import re
 from io import BytesIO
+from fuzzywuzzy import fuzz
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
@@ -161,9 +162,21 @@ def generate_unique_quote(previous_quotes):
     while True:
         quote, detailed_description = generate_quote()
         quote_text = extract_quote_from_tweet(quote)
-        if quote_text not in previous_quotes and len(quote) <= 280:
+        if not is_quote_similar(quote_text, previous_quotes) and len(quote) <= 280:
             break
     return quote, detailed_description
+
+
+def is_quote_similar(quote, previous_quotes, similarity_threshold=90):
+    """
+    Checks if the given quote is similar to any of the previous quotes based on the similarity threshold.
+    Returns True if the quote is similar, False otherwise.
+    """
+    for prev_quote in previous_quotes:
+        similarity = fuzz.token_set_ratio(quote, prev_quote)
+        if similarity >= similarity_threshold:
+            return True
+    return False
 
 
 def trigger_tweet(event, context):
