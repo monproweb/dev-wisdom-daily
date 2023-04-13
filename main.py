@@ -36,15 +36,20 @@ def setup_tweepy_api():
     return tweepy.API(auth, wait_on_rate_limit=True)
 
 
-def generate_quote():
+def generate_quote(API):
     """
-    Generates a developer quote and image description using OpenAI GPT-3.5 Turbo.
+    Generates a developer quote and image description using OpenAI GPT-3.5 Turbo,
+    ensuring that the generated quote is not too similar to any previously tweeted quotes.
     Returns a tuple containing the generated quote formatted for a tweet, and
     a detailed description for generating an image using DALL-E 2.
     """
+    previous_quotes = get_previous_quotes(API)
+    previous_quotes_text = '\n'.join(previous_quotes)
     chat_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Provide an existing quote from a well-known software developer, programmer, software engineer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
+        {"role": "assistant",
+            "content": f"Here are some previous quotes:\n{previous_quotes_text}"},
+        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
     ]
 
     response = openai.ChatCompletion.create(
@@ -154,8 +159,9 @@ def tweet_quote_and_image(API):
 
 def generate_unique_quote(previous_quotes):
     """
-    Generates a unique developer quote that is not in the given list of previous quotes.
-    Returns a tuple containing the unique quote and its corresponding image description.
+    Generates a unique developer quote that is not in the given list of previous quotes
+    or too similar to them. Returns a tuple containing the unique quote and its
+    corresponding image description.
     """
     quote = ""
     detailed_description = ""
