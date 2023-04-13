@@ -4,7 +4,7 @@ import tweepy
 import requests
 import re
 from io import BytesIO
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
@@ -45,23 +45,30 @@ def generate_quote(API):
     """
     previous_quotes = get_previous_quotes(API)
     previous_quotes_text = '\n'.join(previous_quotes)
-    chat_messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "assistant",
-            "content": f"Here are some previous quotes:\n{previous_quotes_text}"},
-        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
-    ]
+    quote = ""
+    quote_text = ""
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=chat_messages,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
+    while True:
+        chat_messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "assistant",
+                "content": f"Here are some previous quotes:\n{previous_quotes_text}"},
+            {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
+        ]
 
-    quote = response.choices[0].message['content'].strip()
-    quote_text = extract_quote_from_tweet(quote)
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=chat_messages,
+            n=1,
+            stop=None,
+            temperature=0.7,
+        )
+
+        quote = response.choices[0].message['content'].strip()
+        quote_text = extract_quote_from_tweet(quote)
+
+        if not is_quote_similar(quote_text, previous_quotes):
+            break
 
     chat_messages.append(
         {"role": "user", "content": f"Describe the quote '{quote_text}' visually with very detailed elements up to 1000 characters for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote. Please provide the description in a single block of text without line breaks."})
