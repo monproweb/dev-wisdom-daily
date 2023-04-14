@@ -143,8 +143,54 @@ def generate_quote(API):
         if not is_quote_similar(quote_text, previous_quotes):
             break
 
+    examples = [
+        "3D render of a cute tropical fish in an aquarium on a dark blue background, digital art",
+        "An armchair in the shape of an avocado",
+        "An expressive oil painting of a basketball player dunking, depicted as an explosion of a nebula",
+        "A photo of a white fur monster standing in a purple room",
+        "An oil painting by Matisse of a humanoid robot playing chess",
+        "A photo of a silhouette of a person in a color lit desert at night",
+        "A blue orange sliced in half laying on a blue floor in front of a blue wall",
+        "A 3D render of an astronaut walking in a green desert",
+        "A futuristic neon lit cyborg face",
+        "A computer from the 90s in the style of vaporwave",
+        "A cartoon of a monkey in space",
+        "A plush toy robot sitting against a yellow wall",
+        "A bowl of soup that is also a portal to another dimension, digital art",
+        "A van Gogh style painting of an American football player",
+        '"A sea otter with a pearl earring" by Johannes Vermeer',
+        "A hand drawn sketch of a Porsche 911",
+        "High quality photo of a monkey astronaut",
+        "A cyberpunk monster in a control room",
+        "A photo of Michelangelo's sculpture of David wearing headphones djing",
+        "An abstract painting of artificial intelligence",
+        "An Andy Warhol style painting of a french bulldog wearing sunglasses",
+        "A photo of a Samoyed dog with its tongue out hugging a white Siamese cat",
+        "A photo of a teddy bear on a skateboard in Times Square",
+        "An abstract oil painting of a river",
+        "A futuristic cyborg poster hanging in a neon lit subway station",
+        "An oil pastel drawing of an annoyed cat in a spaceship",
+        "A sunlit indoor lounge area with a pool with clear water and another pool with translucent pastel pink water, next to a big window, digital art",
+        "A centered explosion of colorful powder on a black background",
+        "A synthwave style sunset above the reflecting water of the sea, digital art",
+        "A handpalm with a tree growing on top of it",
+        "A cartoon of a cat catching a mouse",
+        "A pencil and watercolor drawing of a bright city in the future with flying cars",
+        "A Formula 1 car driving on a neon road",
+        "3D render of a pink balloon dog in a violet room",
+        "A photograph of a sunflower with sunglasses on in the middle of the flower in a field on a bright sunny day",
+        "Two futuristic towers with a skybridge covered in lush foliage, digital art",
+        "A hand-drawn sailboat circled by birds on the sea at sunrise",
+        "A Shiba Inu dog wearing a beret and black turtleneck",
+        "A comic book cover of a superhero wearing headphones",
+        "An abstract visual of artificial intelligence",
+        "A cat riding a motorcycle",
+        "A 3D render of a rainbow colored hot air balloon flying above a reflective lake",
+    ]
+    example_text = "\n".join(examples)
+
     chat_messages.append(
-        {"role": "user", "content": f"Describe the quote '{quote_text}' visually with very detailed elements up to 1000 characters for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote. Please provide the description in a single block of text without line breaks."})
+        {"role": "user", "content": f"Describe the quote '{quote_text}' visually with very detailed elements up to 1000 characters for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote. Please provide the description in a single block of text without line breaks. Also, consider the following examples for inspiration: {example_text}"})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=chat_messages,
