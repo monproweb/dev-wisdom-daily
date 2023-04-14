@@ -129,11 +129,7 @@ def generate_unique_quote(previous_quotes):
     return quote, detailed_description
 
 
-def get_previous_quotes(API, TWITTER_ACCOUNT):
-    """
-    Fetches all previous quotes tweeted by the specified Twitter account.
-    Returns a list of previous quotes.
-    """
+def get_previous_quotes(API):
     all_tweets = tweepy.Cursor(
         API.user_timeline,
         screen_name=TWITTER_ACCOUNT,
