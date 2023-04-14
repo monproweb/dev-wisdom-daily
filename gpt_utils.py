@@ -8,6 +8,7 @@ from rapidfuzz import fuzz
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Other constants
+TWITTER_ACCOUNT = "@DevWisdomDaily"
 MAX_STRING_LENGTH = 1000
 
 # Check API keys and access tokens

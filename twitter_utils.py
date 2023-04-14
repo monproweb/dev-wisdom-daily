@@ -9,9 +9,6 @@ TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
 
-# Other constants
-TWITTER_ACCOUNT = "@DevWisdomDaily"
-
 # Check API keys and access tokens
 if not TWITTER_API_KEY or not TWITTER_API_SECRET or not TWITTER_ACCESS_TOKEN or not TWITTER_ACCESS_TOKEN_SECRET:
     raise ValueError("Please provide Twitter API keys and access tokens.")
