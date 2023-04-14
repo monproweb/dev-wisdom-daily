@@ -2,7 +2,6 @@ import os
 import tweepy
 import requests
 from io import BytesIO
-from gpt_utils import extract_quote_from_tweet
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
@@ -25,21 +24,6 @@ def setup_tweepy_api():
     auth = tweepy.OAuthHandler(TWITTER_API_KEY, TWITTER_API_SECRET)
     auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
     return tweepy.API(auth, wait_on_rate_limit=True)
-
-
-def get_previous_quotes(API, TWITTER_ACCOUNT):
-    """
-    Fetches all previous quotes tweeted by the specified Twitter account.
-    Returns a list of previous quotes.
-    """
-    all_tweets = tweepy.Cursor(
-        API.user_timeline,
-        screen_name=TWITTER_ACCOUNT,
-        count=200,
-        tweet_mode="extended",
-    ).items()
-
-    return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
 
 def upload_media(url, API):

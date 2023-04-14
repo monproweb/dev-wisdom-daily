@@ -1,8 +1,8 @@
 import os
 import openai
+import tweepy
 import re
 from rapidfuzz import fuzz
-from twitter_utils import get_previous_quotes
 
 # Retrieve API keys and access tokens
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -18,7 +18,7 @@ if not OPENAI_API_KEY:
 openai.api_key = OPENAI_API_KEY
 
 
-def generate_quote(API):
+def generate_quote(API, previous_quotes):
     """
     Generates a developer quote and image description using OpenAI GPT-3.5 Turbo,
     ensuring that the generated quote is not too similar to any previously tweeted quotes.
@@ -126,3 +126,18 @@ def generate_unique_quote(previous_quotes):
         if not is_quote_similar(quote_text, previous_quotes) and len(quote) <= 280:
             break
     return quote, detailed_description
+
+
+def get_previous_quotes(API, TWITTER_ACCOUNT):
+    """
+    Fetches all previous quotes tweeted by the specified Twitter account.
+    Returns a list of previous quotes.
+    """
+    all_tweets = tweepy.Cursor(
+        API.user_timeline,
+        screen_name=TWITTER_ACCOUNT,
+        count=200,
+        tweet_mode="extended",
+    ).items()
+
+    return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
