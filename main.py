@@ -150,7 +150,7 @@ def tweet_quote_and_image(API, previous_quotes):
     Generates a unique developer quote and image, and tweets them.
     """
     previous_quotes = get_previous_quotes(API)
-    quote, detailed_description = generate_unique_quote(previous_quotes)
+    quote, detailed_description = generate_unique_quote(API, previous_quotes)
     print(f"Generated quote: {quote}")
     print(f"Generated detailed description: {detailed_description}")
 
