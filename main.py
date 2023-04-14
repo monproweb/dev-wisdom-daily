@@ -36,6 +36,79 @@ def setup_tweepy_api():
     return tweepy.API(auth, wait_on_rate_limit=True)
 
 
+def extract_quote_from_tweet(tweet):
+    """
+    Extracts the quote text from the given tweet text.
+    Returns the extracted quote.
+    """
+    match = re.search(r'"(.*?)"', tweet)
+    return match.group(0) if match else ""
+
+
+def get_previous_quotes(API):
+    """
+    Fetches all previous quotes tweeted by the specified Twitter account.
+    Returns a list of previous quotes.
+    """
+    all_tweets = tweepy.Cursor(
+        API.user_timeline,
+        screen_name=TWITTER_ACCOUNT,
+        count=200,
+        tweet_mode="extended",
+    ).items()
+
+    return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
+
+
+def is_quote_similar(quote, previous_quotes, similarity_threshold=90):
+    """
+    Checks if the given quote is similar to any of the previous quotes based on the similarity threshold.
+    Returns True if the quote is similar, False otherwise.
+    """
+    for prev_quote in previous_quotes:
+        similarity = fuzz.token_set_ratio(quote, prev_quote)
+        if similarity >= similarity_threshold:
+            return True
+    return False
+
+
+def truncate_string(string, max_length):
+    """
+    Truncates the input string to the specified maximum length.
+    Returns the truncated string.
+    """
+    return string if len(string) <= max_length else string[:max_length]
+
+
+def generate_image(prompt):
+    """
+    Generates an image URL using OpenAI DALL-E 2 based on the given prompt.
+    Returns the image URL.
+    """
+    truncated_prompt = truncate_string(prompt, MAX_STRING_LENGTH)
+    response = openai.Image.create(
+        prompt=truncated_prompt,
+        n=1,
+        size="1024x1024",
+        response_format="url",
+    )
+
+    image_url = response.data[0]['url']
+    return image_url
+
+
+def upload_media(url, API):
+    """
+    Uploads an image to Twitter from the given URL.
+    Returns the media ID string.
+    """
+    response = requests.get(url)
+    image_data = BytesIO(response.content)
+
+    media = API.media_upload("quote_image.png", file=image_data)
+    return media.media_id_string
+
+
 def generate_quote(API):
     """
     Generates a developer quote and image description using OpenAI GPT-3.5 Turbo,
@@ -84,65 +157,20 @@ def generate_quote(API):
     return quote, detailed_description
 
 
-def truncate_string(string, max_length):
+def generate_unique_quote(previous_quotes, API):
     """
-    Truncates the input string to the specified maximum length.
-    Returns the truncated string.
+    Generates a unique developer quote that is not in the given list of previous quotes
+    or too similar to them. Returns a tuple containing the unique quote and its
+    corresponding image description.
     """
-    return string if len(string) <= max_length else string[:max_length]
-
-
-def generate_image(prompt):
-    """
-    Generates an image URL using OpenAI DALL-E 2 based on the given prompt.
-    Returns the image URL.
-    """
-    truncated_prompt = truncate_string(prompt, MAX_STRING_LENGTH)
-    response = openai.Image.create(
-        prompt=truncated_prompt,
-        n=1,
-        size="1024x1024",
-        response_format="url",
-    )
-
-    image_url = response.data[0]['url']
-    return image_url
-
-
-def upload_media(url, API):
-    """
-    Uploads an image to Twitter from the given URL.
-    Returns the media ID string.
-    """
-    response = requests.get(url)
-    image_data = BytesIO(response.content)
-
-    media = API.media_upload("quote_image.png", file=image_data)
-    return media.media_id_string
-
-
-def extract_quote_from_tweet(tweet):
-    """
-    Extracts the quote text from the given tweet text.
-    Returns the extracted quote.
-    """
-    match = re.search(r'"(.*?)"', tweet)
-    return match.group(0) if match else ""
-
-
-def get_previous_quotes(API):
-    """
-    Fetches all previous quotes tweeted by the specified Twitter account.
-    Returns a list of previous quotes.
-    """
-    all_tweets = tweepy.Cursor(
-        API.user_timeline,
-        screen_name=TWITTER_ACCOUNT,
-        count=200,
-        tweet_mode="extended",
-    ).items()
-
-    return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
+    quote = ""
+    detailed_description = ""
+    while True:
+        quote, detailed_description = generate_quote(API)
+        quote_text = extract_quote_from_tweet(quote)
+        if not is_quote_similar(quote_text, previous_quotes) and len(quote) <= 280:
+            break
+    return quote, detailed_description
 
 
 def tweet_quote_and_image(API):
@@ -162,34 +190,6 @@ def tweet_quote_and_image(API):
 
     API.update_status(status=quote, media_ids=[media_id])
     print(f"Tweeted: {quote}")
-
-
-def generate_unique_quote(previous_quotes, API):
-    """
-    Generates a unique developer quote that is not in the given list of previous quotes
-    or too similar to them. Returns a tuple containing the unique quote and its
-    corresponding image description.
-    """
-    quote = ""
-    detailed_description = ""
-    while True:
-        quote, detailed_description = generate_quote(API)
-        quote_text = extract_quote_from_tweet(quote)
-        if not is_quote_similar(quote_text, previous_quotes) and len(quote) <= 280:
-            break
-    return quote, detailed_description
-
-
-def is_quote_similar(quote, previous_quotes, similarity_threshold=90):
-    """
-    Checks if the given quote is similar to any of the previous quotes based on the similarity threshold.
-    Returns True if the quote is similar, False otherwise.
-    """
-    for prev_quote in previous_quotes:
-        similarity = fuzz.token_set_ratio(quote, prev_quote)
-        if similarity >= similarity_threshold:
-            return True
-    return False
 
 
 def trigger_tweet(event, context):
