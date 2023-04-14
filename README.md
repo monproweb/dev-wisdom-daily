@@ -1,8 +1,8 @@
-# Developer Quote Twitter Bot
+# 🤖 Developer Quote Twitter Bot
 
 This is a Twitter bot that generates and tweets developer quotes along with an image based on the description provided by the quote.
 
-## Technologies Used
+## 🚀 Technologies Used
 
 - [OpenAI API](https://openai.com/)
 - [Tweepy](https://www.tweepy.org/)
@@ -11,13 +11,13 @@ This is a Twitter bot that generates and tweets developer quotes along with an i
 - [Google Cloud Pub/Sub](https://cloud.google.com/pubsub)
 - [Python](https://www.python.org/)
 
-## Prerequisites
+## 📋 Prerequisites
 
-- Python 3.10 or higher
+- Python 3.6 or higher
 - A Twitter Developer account with API keys and access tokens
 - An OpenAI API key
 
-## Setup
+## 🛠️ Setup
 
 To set up this project locally, you will need to:
 
@@ -29,19 +29,20 @@ To set up this project locally, you will need to:
    - `TWITTER_ACCESS_TOKEN`
    - `TWITTER_ACCESS_TOKEN_SECRET`
    - `OPENAI_API_KEY` (Follow the [official documentation](https://beta.openai.com/docs/developer-quickstart) to obtain an OpenAI API key)
+   - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
 4. Deploy the function to Google Cloud Functions
 5. Create a topic in Google Cloud Pub/Sub
 6. Create a subscription for the topic
 7. Create a Cloud Scheduler job to trigger the function with a Pub/Sub target
 
-## Usage
+## 🎯 Usage
 
 Once the project is set up, the bot will automatically tweet a new developer quote with an image at the specified intervals set up in the Cloud Scheduler job.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please open an issue. If you want to contribute code, please fork the repository and create a pull request.
 
-## License
+## 📄 License
 
 This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
