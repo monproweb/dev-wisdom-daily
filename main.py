@@ -145,7 +145,7 @@ def get_previous_quotes(API):
     return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
 
-def tweet_quote_and_image(API):
+def tweet_quote_and_image(API, previous_quotes):
     """
     Generates a unique developer quote and image, and tweets them.
     """
