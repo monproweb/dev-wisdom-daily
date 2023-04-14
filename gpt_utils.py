@@ -129,7 +129,7 @@ def generate_unique_quote(previous_quotes):
     return quote, detailed_description
 
 
-def get_previous_quotes(API):
+def get_previous_quotes(API, TWITTER_ACCOUNT):
     all_tweets = tweepy.Cursor(
         API.user_timeline,
         screen_name=TWITTER_ACCOUNT,
