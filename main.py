@@ -150,7 +150,7 @@ def tweet_quote_and_image(API):
     Generates a unique developer quote and image, and tweets them.
     """
     previous_quotes = get_previous_quotes(API)
-    quote, detailed_description = generate_unique_quote(previous_quotes)
+    quote, detailed_description = generate_unique_quote(previous_quotes, API)
     print(f"Generated quote: {quote}")
     print(f"Generated detailed description: {detailed_description}")
 
@@ -164,7 +164,7 @@ def tweet_quote_and_image(API):
     print(f"Tweeted: {quote}")
 
 
-def generate_unique_quote(previous_quotes):
+def generate_unique_quote(previous_quotes, API):
     """
     Generates a unique developer quote that is not in the given list of previous quotes
     or too similar to them. Returns a tuple containing the unique quote and its
@@ -173,7 +173,7 @@ def generate_unique_quote(previous_quotes):
     quote = ""
     detailed_description = ""
     while True:
-        quote, detailed_description = generate_quote()
+        quote, detailed_description = generate_quote(API)
         quote_text = extract_quote_from_tweet(quote)
         if not is_quote_similar(quote_text, previous_quotes) and len(quote) <= 280:
             break
