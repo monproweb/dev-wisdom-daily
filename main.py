@@ -45,30 +45,23 @@ def generate_quote(API):
     """
     previous_quotes = get_previous_quotes(API)
     previous_quotes_text = '\n'.join(previous_quotes)
-    quote = ""
-    quote_text = ""
+    chat_messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "assistant",
+            "content": f"Here are some previous quotes:\n{previous_quotes_text}"},
+        {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
+    ]
 
-    while True:
-        chat_messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "assistant",
-                "content": f"Here are some previous quotes:\n{previous_quotes_text}"},
-            {"role": "user", "content": "Provide an existing quote from a well-known developer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Your Tweet can contain up to 280 characters maximum, formatted starting with the quote followed by the name and be conversational at the end."},
-        ]
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=chat_messages,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=chat_messages,
-            n=1,
-            stop=None,
-            temperature=0.7,
-        )
-
-        quote = response.choices[0].message['content'].strip()
-        quote_text = extract_quote_from_tweet(quote)
-
-        if not is_quote_similar(quote_text, previous_quotes):
-            break
+    quote = response.choices[0].message['content'].strip()
+    quote_text = extract_quote_from_tweet(quote)
 
     chat_messages.append(
         {"role": "user", "content": f"Describe the quote '{quote_text}' visually with very detailed elements up to 1000 characters for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote. Please provide the description in a single block of text without line breaks."})
@@ -145,12 +138,12 @@ def get_previous_quotes(API):
     return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
 
-def tweet_quote_and_image(API, previous_quotes):
+def tweet_quote_and_image(API):
     """
     Generates a unique developer quote and image, and tweets them.
     """
     previous_quotes = get_previous_quotes(API)
-    quote, detailed_description = generate_unique_quote(API, previous_quotes)
+    quote, detailed_description = generate_unique_quote(previous_quotes)
     print(f"Generated quote: {quote}")
     print(f"Generated detailed description: {detailed_description}")
 
@@ -164,7 +157,7 @@ def tweet_quote_and_image(API, previous_quotes):
     print(f"Tweeted: {quote}")
 
 
-def generate_unique_quote(API, previous_quotes):
+def generate_unique_quote(previous_quotes):
     """
     Generates a unique developer quote that is not in the given list of previous quotes
     or too similar to them. Returns a tuple containing the unique quote and its
@@ -173,7 +166,7 @@ def generate_unique_quote(API, previous_quotes):
     quote = ""
     detailed_description = ""
     while True:
-        quote, detailed_description = generate_quote(API)
+        quote, detailed_description = generate_quote()
         quote_text = extract_quote_from_tweet(quote)
         if not is_quote_similar(quote_text, previous_quotes) and len(quote) <= 280:
             break
