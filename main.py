@@ -191,8 +191,7 @@ def generate_quote(API, previous_quotes_text):
         quote = response.choices[0].message["content"].strip()
         quote_text = extract_quote_from_tweet(quote)
 
-        # Check if the generated quote is similar to previous quotes
-        if not is_quote_similar(quote_text, previous_quotes_text):
+        if not is_quote_similar(quote_text, previous_quotes_text) and len(quote) <= 280:
             break
 
     return quote, quote_text
