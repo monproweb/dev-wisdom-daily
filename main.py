@@ -184,7 +184,6 @@ def generate_quote(API, previous_quotes_text):
             model="gpt-3.5-turbo",
             messages=chat_messages,
             n=1,
-            max_tokens=80,
             stop=None,
             temperature=0.7,
         )
