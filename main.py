@@ -1,6 +1,5 @@
 import os
 import openai
-from openai import OpenAIError
 import tweepy
 import requests
 import re
@@ -327,10 +326,14 @@ def tweet_quote_and_image(API):
 
     except tweepy.errors.Unauthorized as e:
         print(f"An error occurred while interacting with the Twitter API: {e}")
-        if e.api_codes and 89 in e.api_codes:
+        if e.api_codes and 89 in e.api_codes:  # Invalid or expired token
             print("Please check your Twitter API keys and access tokens.")
-    except OpenAIError as e:
-        print(f"An error occurred while interacting with the OpenAI API: {e}")
+    except openai.error.APIError as e:
+        print(f"OpenAI API returned an API Error: {e}")
+    except openai.error.APIConnectionError as e:
+        print(f"Failed to connect to OpenAI API: {e}")
+    except openai.error.RateLimitError as e:
+        print(f"OpenAI API request exceeded rate limit: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
