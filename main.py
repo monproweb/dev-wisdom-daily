@@ -254,12 +254,25 @@ def generate_unique_quote(previous_quotes, API):
 def tweet_quote_and_image(API):
     """
     Tweets the given quote and an image generated based on the detailed_description.
+    If the tweet fails due to a "Forbidden" error (403), a new quote is generated and the process is retried.
 
     Args:
         API (tweepy.API): The Tweepy API object.
         quote (str): The quote to be tweeted.
         detailed_description (str): The detailed description for generating an image using DALL-E 2.
     """
+
+    def post_tweet(quote, media_id):
+        try:
+            API.update_status(status=quote, media_ids=[media_id])
+            print(f"Tweeted: {quote}")
+        except tweepy.errors.Forbidden:
+            print("Tweeting failed due to forbidden error. Generating a new quote...")
+            previous_quotes = get_previous_quotes(API)
+            previous_quotes_text = "\n".join(previous_quotes)
+            new_quote, _ = generate_quote(API, previous_quotes_text)
+            post_tweet(new_quote, media_id)
+
     try:
         previous_quotes = get_previous_quotes(API)
         previous_quotes_text = "\n".join(previous_quotes)
@@ -321,8 +334,7 @@ def tweet_quote_and_image(API):
         media_id = upload_media(image_url, API)
         print(f"Uploaded media ID: {media_id}")
 
-        API.update_status(status=quote, media_ids=[media_id])
-        print(f"Tweeted: {quote}")
+        post_tweet(quote, media_id)
 
     except tweepy.errors.Unauthorized as e:
         print(f"An error occurred while interacting with the Twitter API: {e}")
