@@ -325,9 +325,9 @@ def tweet_quote_and_image(API):
         API.update_status(status=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
 
-    except tweepy.TweepyException as e:
+    except tweepy.errors.Unauthorized as e:
         print(f"An error occurred while interacting with the Twitter API: {e}")
-        if e.api_code == 89:  # Invalid or expired token
+        if e.api_codes and 89 in e.api_codes:
             print("Please check your Twitter API keys and access tokens.")
     except OpenAIError as e:
         print(f"An error occurred while interacting with the OpenAI API: {e}")
