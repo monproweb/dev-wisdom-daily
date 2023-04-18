@@ -78,7 +78,7 @@ def get_previous_quotes(API):
     return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
 
-def is_quote_similar(quote, previous_quotes_text, similarity_threshold=90):
+def is_quote_similar(quote, previous_quotes_text, similarity_threshold=80):
     """
     Checks if the given quote is similar to any of the previous quotes based on the similarity threshold.
 
