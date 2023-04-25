@@ -175,7 +175,7 @@ def generate_quote(API, previous_quotes_text):
             },
             {
                 "role": "user",
-                "content": "Provide an existing quote from a well-known software developer, programmer, software engineer or tech figure, along with their name. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Formatted starting with the quote followed by the name and be conversational at the end.",
+                "content": "Provide an existing quote from a well-known software developer, programmer, software engineer or tech figure, along with their name. The quote should not be similar to any previous quotes. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Formatted starting with the quote followed by the name and be conversational at the end.",
             },
         ]
 
