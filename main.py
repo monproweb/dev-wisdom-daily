@@ -239,11 +239,11 @@ def generate_detailed_description(quote_text, examples):
     chat_messages = [
         {
             "role": "system",
-            "content": "You are an AI trained to create visual prompts for DALL-E based on quotes.",
+            "content": "You are an AI trained to create visuals for DALL-E based on quote.",
         },
         {
             "role": "user",
-            "content": f"Directly describe a visual scene inspired by the quote '{quote_text}' without any introduction. Use these examples for inspiration: {example_text}",
+            "content": f"Directly describe image inspired by the quote '{quote_text}' without any introduction. Use these examples for inspiration: {example_text}",
         },
     ]
 
