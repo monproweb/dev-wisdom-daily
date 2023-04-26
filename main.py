@@ -152,7 +152,7 @@ def generate_quote(API, previous_quotes_text):
             n=1,
             stop=None,
             temperature=0.7,
-            max_tokens=70,
+            max_tokens=65,
         )
 
         quote = response.choices[0].message["content"].strip()
