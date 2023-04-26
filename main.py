@@ -135,14 +135,17 @@ def generate_quote(API, previous_quotes_text):
 
     while True:
         chat_messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
+            {
+                "role": "system",
+                "content": "You are an AI trained to generate distinct quotes from well-known tech figures.",
+            },
             {
                 "role": "assistant",
                 "content": f"Here are some previous quotes:\n{previous_quotes_text}",
             },
             {
                 "role": "user",
-                "content": "Provide an existing quote from a well-known software developer, programmer, software engineer or tech figure, along with their name. The quote should not be similar to any previous quotes. Include a maximum of 1-2 related hashtags for Twitter. Keep your copy short and sweet. Add in emoji or a touch of sass or silliness — and let the engagement be your guide. Formatted starting with the quote followed by the name and be conversational at the end.",
+                "content": "Provide a unique quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. The quote should be different from the previous ones. Add 1-2 relevant hashtags and emojis. Keep it short and engaging. Format the quote starting with the quote itself, followed by the name, and ending with a conversational touch.",
             },
         ]
 
@@ -152,7 +155,7 @@ def generate_quote(API, previous_quotes_text):
             n=1,
             stop=None,
             temperature=0.7,
-            max_tokens=65,
+            max_tokens=60,
         )
 
         quote = response.choices[0].message["content"].strip()
@@ -234,10 +237,13 @@ def generate_detailed_description(quote_text, examples):
     example_text = "\n".join(examples)
 
     chat_messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
+        {
+            "role": "system",
+            "content": "You are an AI trained to create visual descriptions for quotes.",
+        },
         {
             "role": "user",
-            "content": f"Describe the quote '{quote_text}' visually with very detailed elements for generating an image, making sure there is absolutely NO text on the image. The image should only contain visuals that represent the idea behind the quote. Please provide the description in a single block of text without line breaks. Also, consider the following examples for inspiration: {example_text}",
+            "content": f"Visually interpret '{quote_text}'. Draw inspiration from: {example_text}",
         },
     ]
 
@@ -247,7 +253,7 @@ def generate_detailed_description(quote_text, examples):
         n=1,
         stop=None,
         temperature=0.7,
-        max_tokens=250,
+        max_tokens=35,
     )
 
     detailed_description = response.choices[0].message["content"].strip()
