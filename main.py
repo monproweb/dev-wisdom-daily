@@ -4,7 +4,6 @@ import tweepy
 import requests
 import re
 from io import BytesIO
-from rapidfuzz import fuzz
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
@@ -18,7 +17,6 @@ openai.api_key = OPENAI_API_KEY
 
 # Other constants
 TWITTER_ACCOUNT = "@DevWisdomDaily"
-MAX_STRING_LENGTH = 1000
 
 
 def check_api_keys():
@@ -85,39 +83,6 @@ def extract_quote_from_tweet(tweet):
     return match.group(0) if match else ""
 
 
-def is_quote_similar(quote, previous_quotes_text, similarity_threshold=80):
-    """
-    Checks if the given quote is similar to any of the previous quotes based on the similarity threshold.
-
-    Args:
-        quote (str): The quote to be checked for similarity.
-        previous_quotes (list[str]): A list of previous quotes to compare against.
-        similarity_threshold (int, optional): The similarity threshold to be considered a match. Defaults to 90.
-
-    Returns:
-        bool: True if the quote is similar, False otherwise.
-    """
-    for prev_quote in previous_quotes_text.split("\n"):
-        similarity = fuzz.token_set_ratio(quote, prev_quote)
-        if similarity >= similarity_threshold:
-            return True
-    return False
-
-
-def truncate_string(string, max_length):
-    """
-    Truncates the input string to the specified maximum length.
-
-    Args:
-        string (str): The string to be truncated.
-        max_length (int): The maximum length of the truncated string.
-
-    Returns:
-        str: The truncated string.
-    """
-    return string if len(string) <= max_length else string[:max_length]
-
-
 def generate_quote(API, previous_quotes_text):
     """
     Generates a developer quote using OpenAI GPT-3.5 Turbo, ensuring that the generated quote is not too similar
@@ -137,15 +102,15 @@ def generate_quote(API, previous_quotes_text):
         chat_messages = [
             {
                 "role": "system",
-                "content": "You are an AI trained to generate distinct quotes from well-known tech figures.",
+                "content": "Generate distinct and engaging quotes from well-known tech figures for DevWisdomDaily, an automated Twitter bot that aims to go viral and attract a large audience with its tweets containing relevant hashtags, images, and emojis posted every 12 hours.",
             },
             {
                 "role": "assistant",
-                "content": f"Here are some previous quotes:\n{previous_quotes_text}",
+                "content": f"Here are some previous quotes posted by DevWisdomDaily:\n{previous_quotes_text}",
             },
             {
                 "role": "user",
-                "content": "Provide a unique quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. The quote should be different from the previous ones. Add 1-2 relevant hashtags and emojis. Keep it short and engaging. Format the quote starting with the quote itself, followed by the name, and ending with a conversational touch.",
+                "content": "Craft a unique, captivating, and concise quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. Make sure the quote differs from previous ones and resonates with the tech community. Add 1-2 trending or relevant hashtags and emojis to increase engagement. Format the quote in a shareable and conversational style: start with the quote itself, followed by the name, and end with an engaging touch.",
             },
         ]
 
@@ -155,16 +120,13 @@ def generate_quote(API, previous_quotes_text):
             n=1,
             stop=None,
             temperature=0.7,
-            max_tokens=60,
+            max_tokens=65,
         )
 
         quote = response.choices[0].message["content"].strip()
         quote_text = extract_quote_from_tweet(quote)
 
-        if not is_quote_similar(quote_text, previous_quotes_text) and len(quote) <= 280:
-            break
-
-    return quote, quote_text
+        return quote, quote_text
 
 
 def get_image_examples():
@@ -239,11 +201,15 @@ def generate_detailed_description(quote_text, examples):
     chat_messages = [
         {
             "role": "system",
-            "content": "You are an AI trained to create visuals for DALL-E based on quote.",
+            "content": "Your task is to create engaging and visually striking images for Twitter based on quotes, with the goal of making them go viral. Generate detailed descriptions that can be used to create images with DALL-E.",
+        },
+        {
+            "role": "assistant",
+            "content": f"Here are some examples of image descriptions to inspire you:\n{example_text}",
         },
         {
             "role": "user",
-            "content": f"Directly describe image inspired by the quote '{quote_text}' without any introduction. Use these examples for inspiration: {example_text}",
+            "content": f"Directly provide a detailed and creative image description inspired by the quote '{quote_text}', suitable for creating an engaging visual on Twitter, without any introduction.",
         },
     ]
 
@@ -252,7 +218,7 @@ def generate_detailed_description(quote_text, examples):
         messages=chat_messages,
         n=1,
         stop=None,
-        temperature=0.7,
+        temperature=0.8,
         max_tokens=35,
     )
 
@@ -270,9 +236,8 @@ def generate_image(prompt):
     Returns:
         str: The image URL generated by DALL-E 2.
     """
-    truncated_prompt = truncate_string(prompt, MAX_STRING_LENGTH)
     response = openai.Image.create(
-        prompt=truncated_prompt,
+        prompt=prompt,
         n=1,
         size="1024x1024",
         response_format="url",
