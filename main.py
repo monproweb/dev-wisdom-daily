@@ -209,7 +209,7 @@ def generate_detailed_description(quote_text, examples):
         },
         {
             "role": "user",
-            "content": f"Directly provide a detailed and creative image description inspired by the quote '{quote_text}', suitable for creating an engaging visual on Twitter, without any introduction.",
+            "content": f"Directly provide a detailed and creative image description inspired by the quote '{quote_text}', suitable for creating an engaging visual on Twitter. The description should focus on visual elements that can be clearly depicted in an image, with an emphasis on objects, color, and composition, similar to the examples provided.",
         },
     ]
 
