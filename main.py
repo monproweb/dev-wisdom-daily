@@ -120,7 +120,7 @@ def generate_quote(API, previous_quotes_text):
             n=1,
             stop=None,
             temperature=0.7,
-            max_tokens=65,
+            max_tokens=60,
         )
 
         quote = response.choices[0].message["content"].strip()
@@ -219,7 +219,7 @@ def generate_detailed_description(quote_text, examples):
         n=1,
         stop=None,
         temperature=0.8,
-        max_tokens=35,
+        max_tokens=250,
     )
 
     detailed_description = response.choices[0].message["content"].strip()
@@ -280,31 +280,31 @@ def tweet_quote_and_image(API):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
+            return True
         except tweepy.errors.Forbidden:
             print("Tweeting failed due to forbidden error. Generating a new quote...")
-            previous_quotes = get_previous_quotes(API)
-            previous_quotes_text = "\n".join(previous_quotes)
-            new_quote, _ = generate_quote(API, previous_quotes_text)
-            post_tweet(new_quote, media_id)
+            return False
 
     try:
         previous_quotes = get_previous_quotes(API)
         previous_quotes_text = "\n".join(previous_quotes)
 
-        quote, quote_text = generate_quote(API, previous_quotes_text)
-        print(f"Generated quote: {quote}")
+        while True:
+            quote, quote_text = generate_quote(API, previous_quotes_text)
+            print(f"Generated quote: {quote}")
 
-        examples = get_image_examples()
-        detailed_description = generate_detailed_description(quote_text, examples)
-        print(f"Generated detailed description: {detailed_description}")
+            examples = get_image_examples()
+            detailed_description = generate_detailed_description(quote_text, examples)
+            print(f"Generated detailed description: {detailed_description}")
 
-        image_url = generate_image(detailed_description)
-        print(f"Generated image URL: {image_url}")
+            image_url = generate_image(detailed_description)
+            print(f"Generated image URL: {image_url}")
 
-        media_id = upload_media(image_url, API)
-        print(f"Uploaded media ID: {media_id}")
+            media_id = upload_media(image_url, API)
+            print(f"Uploaded media ID: {media_id}")
 
-        post_tweet(quote, media_id)
+            if post_tweet(quote, media_id):
+                break
 
     except Exception as e:
         handle_error(e)
