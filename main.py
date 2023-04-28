@@ -201,7 +201,7 @@ def generate_detailed_description(quote_text, examples):
     chat_messages = [
         {
             "role": "system",
-            "content": "Your task is to create engaging and visually striking images for Twitter based on quotes, with the goal of making them go viral. Generate detailed descriptions that can be used to create images with DALL-E.",
+            "content": "Your task is to create engaging and visually striking images for Twitter based on quotes, with the goal of making them go viral. Generate detailed descriptions that can be used to create images with DALL-E. Remember to be more descriptive by adding details like adjectives, locations, or even artistic styles such as 'digital art' and 'photorealistic.'",
         },
         {
             "role": "assistant",
@@ -209,7 +209,7 @@ def generate_detailed_description(quote_text, examples):
         },
         {
             "role": "user",
-            "content": f"Directly provide a detailed and creative image description inspired by the quote '{quote_text}', suitable for creating an engaging visual on Twitter. The description should focus on visual elements that can be clearly depicted in an image, with an emphasis on objects, color, and composition, similar to the examples provided.",
+            "content": f"Directly provide a detailed and creative image description inspired by the quote '{quote_text}', suitable for creating an engaging visual on Twitter. The description should focus on visual elements that can be clearly depicted in an image, with an emphasis on objects, color, and composition, similar to the examples provided. Be sure to include adjectives, locations, or artistic styles for more effective results.",
         },
     ]
 
