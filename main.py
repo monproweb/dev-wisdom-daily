@@ -201,15 +201,15 @@ def generate_detailed_description(quote_text, examples):
     chat_messages = [
         {
             "role": "system",
-            "content": "Your task is to create engaging, visually striking, and creative images based on quotes. Generate detailed descriptions that can be used to create images with DALL-E. Remember to include adjectives, locations, and artistic styles such as 'digital art' and 'photorealistic.' Incorporate elements from the quote and expand on them to create a vivid scene or metaphor.",
+            "content": "Your task is to create engaging, visually striking, and creative images based on quotes. Remember to include adjectives, locations, and artistic styles such as 'digital art' and 'photorealistic.' Incorporate elements from the quote and expand on them to create a vivid scene or metaphor.",
         },
         {
             "role": "assistant",
-            "content": f"Here are some examples of image descriptions to inspire you:\n{example_text}",
+            "content": f"Here are some examples to inspire you:\n{example_text}",
         },
         {
             "role": "user",
-            "content": f"Create a detailed and imaginative image description inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
+            "content": f"Create a detailed and imaginative image inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
         },
     ]
 
