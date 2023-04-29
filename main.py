@@ -209,7 +209,7 @@ def generate_detailed_description(quote_text, examples):
         },
         {
             "role": "user",
-            "content": f"Create a detailed and imaginative image description inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor.",
+            "content": f"Create a detailed and imaginative image description inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description in a single line without line breaks.",
         },
     ]
 
@@ -219,7 +219,7 @@ def generate_detailed_description(quote_text, examples):
         n=1,
         stop=None,
         temperature=0.8,
-        max_tokens=200,
+        max_tokens=150,
     )
 
     detailed_description = response.choices[0].message["content"].strip()
