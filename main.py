@@ -219,7 +219,7 @@ def generate_detailed_description(quote_text, examples):
         n=1,
         stop=None,
         temperature=0.8,
-        max_tokens=200,
+        max_tokens=225,
     )
 
     detailed_description = response.choices[0].message["content"].strip()
