@@ -110,7 +110,7 @@ def generate_quote(API, previous_quotes_text):
             },
             {
                 "role": "user",
-                "content": "Craft a unique, captivating, and concise quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. Make sure the quote differs from previous ones and resonates with the tech community. Add 1-2 relevant hashtags and emojis to increase engagement. Format the quote in a shareable and conversational style: start with the quote itself, followed by the name, and end with an engaging touch.",
+                "content": "Craft a unique, captivating, and concise quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. Make sure the quote differs from previous ones and resonates with the tech community. Add 1-2 relevant hashtags and emojis to increase engagement. Start with the quote itself, followed by the name, emojis and end with hashtags.",
             },
         ]
 
