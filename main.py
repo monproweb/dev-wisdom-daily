@@ -62,7 +62,7 @@ def get_previous_quotes(API):
     all_tweets = tweepy.Cursor(
         API.user_timeline,
         screen_name=TWITTER_ACCOUNT,
-        count=60,
+        count=200,
         tweet_mode="extended",
     ).items()
 
