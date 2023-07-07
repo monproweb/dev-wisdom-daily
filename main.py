@@ -85,7 +85,7 @@ def extract_quote_from_tweet(tweet):
 
 def generate_quote(API, previous_quotes_text):
     """
-    Generates a developer quote using OpenAI GPT-3.5 Turbo, ensuring that the generated quote is not too similar
+    Generates a developer quote using OpenAI GPT-4, ensuring that the generated quote is not too similar
     to any previously tweeted quotes.
 
     Args:
@@ -115,7 +115,7 @@ def generate_quote(API, previous_quotes_text):
         ]
 
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=chat_messages,
             n=1,
             stop=None,
@@ -187,7 +187,7 @@ def get_image_examples():
 
 def generate_detailed_description(quote_text, examples):
     """
-    Generates a detailed description for an image using OpenAI GPT-3.5 Turbo based on the given quote_text.
+    Generates a detailed description for an image using OpenAI GPT-4 based on the given quote_text.
 
     Args:
         quote_text (str): The quote text to base the image description on.
@@ -214,7 +214,7 @@ def generate_detailed_description(quote_text, examples):
     ]
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=chat_messages,
         n=1,
         stop=None,
