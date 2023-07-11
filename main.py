@@ -278,11 +278,12 @@ def tweet_quote_and_image(API):
         threads_api (ThreadsAPI): The ThreadsAPI object.
     """
 
+    api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
+
     def post_tweet(quote, media_id):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
-            api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
             api.publish(caption=quote, image_path=image_url)
             print(f"Published on Threads: {quote}")
             return True
