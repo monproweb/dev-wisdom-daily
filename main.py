@@ -4,12 +4,15 @@ import tweepy
 import requests
 import re
 from io import BytesIO
+from threads_api.src.threads_api import ThreadsAPI
+import asyncio
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
+THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Set up OpenAI API
@@ -17,6 +20,7 @@ openai.api_key = OPENAI_API_KEY
 
 # Other constants
 TWITTER_ACCOUNT = "@DevWisdomDaily"
+THREADS_USERNAME = os.environ.get("devwisdomdaily")
 
 
 def check_api_keys():
@@ -265,6 +269,17 @@ def upload_media(url, API):
     return media.media_id_string
 
 
+async def post_to_threads(quote):
+    threads_api = ThreadsAPI()
+    await threads_api.login(THREADS_USERNAME, THREADS_PASSWORD)
+    result = await threads_api.post(quote)
+
+    if result:
+        print("Post has been successfully posted to Threads.net")
+    else:
+        print("Unable to post to Threads.net.")
+
+
 def tweet_quote_and_image(API):
     """
     Tweets the given quote and an image generated based on the detailed_description.
@@ -304,6 +319,7 @@ def tweet_quote_and_image(API):
             print(f"Uploaded media ID: {media_id}")
 
             if post_tweet(quote, media_id):
+                asyncio.run(post_to_threads(quote))
                 break
 
     except Exception as e:
