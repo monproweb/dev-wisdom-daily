@@ -341,7 +341,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def trigger_tweet(event, context, threads_api):
+def trigger_tweet(event, context, threads_api=None):
     """
     Triggers the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
@@ -351,7 +351,8 @@ def trigger_tweet(event, context, threads_api):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    threads_api = ThreadsAPI(username=THREADS_USERNAME, password=THREADS_PASSWORD)
+    if threads_api is None:
+        threads_api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
     tweet_quote_and_image(API, threads_api)
 
 
@@ -362,7 +363,8 @@ def main(threads_api):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    threads_api = ThreadsAPI(username=THREADS_USERNAME, password=THREADS_PASSWORD)
+    if threads_api is None:
+        threads_api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
     tweet_quote_and_image(API, threads_api)
 
 
