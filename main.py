@@ -375,12 +375,10 @@ def post_quote_on_threads():
         response.raise_for_status()
 
     try:
-        previous_quotes = get_previous_quotes()  # You need to define this function
+        previous_quotes = get_previous_quotes()
         while True:
-            quote, quote_text = generate_quote(
-                previous_quotes
-            )  # You need to define this function
-            quote = remove_hashtags(quote)  # Remove hashtags from the quote
+            quote = generate_quote(previous_quotes)
+            quote = remove_hashtags(quote)
             print(f"Generated quote: {quote}")
 
             token, device_id = authenticate()
