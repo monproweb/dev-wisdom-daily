@@ -51,7 +51,7 @@ def setup_tweepy_api():
 
 def get_previous_quotes(API):
     """
-    Fetches the 50 latest quotes tweeted by the specified Twitter account.
+    Fetches the 20 latest quotes tweeted by the specified Twitter account.
 
     Args:
         API (tweepy.API): An instance of the Tweepy API object.
@@ -62,9 +62,9 @@ def get_previous_quotes(API):
     all_tweets = tweepy.Cursor(
         API.user_timeline,
         screen_name=TWITTER_ACCOUNT,
-        count=50,
+        count=20,
         tweet_mode="extended",
-    ).items(50)
+    ).items(20)
 
     return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
@@ -101,10 +101,6 @@ def generate_quote(API, previous_quotes_text):
     while True:
         chat_messages = [
             {
-                "role": "system",
-                "content": "Generate distinct and engaging quotes from well-known tech figures for DevWisdomDaily, an automated Twitter bot that aims to go viral and attract a large audience with its tweets containing relevant hashtags, images, and emojis posted every 12 hours.",
-            },
-            {
                 "role": "assistant",
                 "content": f"Here are some previous quotes posted by DevWisdomDaily:\n{previous_quotes_text}",
             },
@@ -129,87 +125,25 @@ def generate_quote(API, previous_quotes_text):
         return quote, quote_text
 
 
-def get_image_examples():
-    """
-    Return a list of image description examples.
-
-    This function provides a list of textual image descriptions that can be used as examples
-    for generating images with DALL-E or any other image generation AI.
-
-    Returns:
-        list: A list of strings, each describing a unique and creative image example.
-    """
-    return [
-        "3D render of a cute tropical fish in an aquarium on a dark blue background, digital art",
-        "An armchair in the shape of an avocado",
-        "An expressive oil painting of a basketball player dunking, depicted as an explosion of a nebula",
-        "A photo of a white fur monster standing in a purple room",
-        "An oil painting by Matisse of a humanoid robot playing chess",
-        "A photo of a silhouette of a person in a color lit desert at night",
-        "A blue orange sliced in half laying on a blue floor in front of a blue wall",
-        "A 3D render of an astronaut walking in a green desert",
-        "A futuristic neon lit cyborg face",
-        "A computer from the 90s in the style of vaporwave",
-        "A cartoon of a monkey in space",
-        "A plush toy robot sitting against a yellow wall",
-        "A bowl of soup that is also a portal to another dimension, digital art",
-        "A van Gogh style painting of an American football player",
-        '"A sea otter with a pearl earring" by Johannes Vermeer',
-        "A hand drawn sketch of a Porsche 911",
-        "High quality photo of a monkey astronaut",
-        "A cyberpunk monster in a control room",
-        "A photo of Michelangelo's sculpture of David wearing headphones djing",
-        "An abstract painting of artificial intelligence",
-        "An Andy Warhol style painting of a french bulldog wearing sunglasses",
-        "A photo of a Samoyed dog with its tongue out hugging a white Siamese cat",
-        "A photo of a teddy bear on a skateboard in Times Square",
-        "An abstract oil painting of a river",
-        "A futuristic cyborg poster hanging in a neon lit subway station",
-        "An oil pastel drawing of an annoyed cat in a spaceship",
-        "A sunlit indoor lounge area with a pool with clear water and another pool with translucent pastel pink water, next to a big window, digital art",
-        "A centered explosion of colorful powder on a black background",
-        "A synthwave style sunset above the reflecting water of the sea, digital art",
-        "A handpalm with a tree growing on top of it",
-        "A cartoon of a cat catching a mouse",
-        "A pencil and watercolor drawing of a bright city in the future with flying cars",
-        "A Formula 1 car driving on a neon road",
-        "3D render of a pink balloon dog in a violet room",
-        "A photograph of a sunflower with sunglasses on in the middle of the flower in a field on a bright sunny day",
-        "Two futuristic towers with a skybridge covered in lush foliage, digital art",
-        "A hand-drawn sailboat circled by birds on the sea at sunrise",
-        "A Shiba Inu dog wearing a beret and black turtleneck",
-        "A comic book cover of a superhero wearing headphones",
-        "An abstract visual of artificial intelligence",
-        "A cat riding a motorcycle",
-        "A 3D render of a rainbow colored hot air balloon flying above a reflective lake",
-    ]
-
-
-def generate_detailed_description(quote_text, examples):
+def generate_detailed_description(quote_text):
     """
     Generates a detailed description for an image using OpenAI GPT-4 based on the given quote_text.
 
     Args:
         quote_text (str): The quote text to base the image description on.
-        example_text (str): A string containing examples of image descriptions, separated by newlines.
 
     Returns:
         str: The detailed description for generating an image using DALL-E 2.
     """
-    example_text = "\n".join(examples)
 
     chat_messages = [
         {
             "role": "system",
-            "content": "Your task is to create engaging, visually striking, and creative images based on quotes. Remember to include adjectives, locations, and artistic styles such as 'digital art' and 'photorealistic.' Incorporate elements from the quote and expand on them to create a vivid scene or metaphor.",
-        },
-        {
-            "role": "assistant",
-            "content": f"Here are some examples to inspire you:\n{example_text}",
+            "content": "Your task is to create engaging, visually striking, and creative images based on quotes.",
         },
         {
             "role": "user",
-            "content": f"Create a detailed and imaginative image inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
+            "content": f"Create a detailed and imaginative image. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
         },
     ]
 
@@ -293,8 +227,7 @@ def tweet_quote_and_image(API):
             quote, quote_text = generate_quote(API, previous_quotes_text)
             print(f"Generated quote: {quote}")
 
-            examples = get_image_examples()
-            detailed_description = generate_detailed_description(quote_text, examples)
+            detailed_description = generate_detailed_description(quote_text)
             print(f"Generated detailed description: {detailed_description}")
 
             image_url = generate_image(detailed_description)
@@ -325,7 +258,7 @@ def handle_error(e):
     """
     if isinstance(e, tweepy.errors.Unauthorized):
         print(f"An error occurred while interacting with the Twitter API: {e}")
-        if e.api_codes and 89 in e.api_codes:  # Invalid or expired token
+        if e.api_codes and 89 in e.api_codes:
             print("Please check your Twitter API keys and access tokens.")
     elif isinstance(e, openai.error.APIError):
         print(f"OpenAI API returned an API Error: {e}")
