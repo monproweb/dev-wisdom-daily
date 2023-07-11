@@ -342,7 +342,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def trigger_tweet(event, context):
+def trigger_tweet(event, context, api):
     """
     Triggers the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
