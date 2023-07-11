@@ -12,7 +12,6 @@ TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
-THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Set up OpenAI API
@@ -20,7 +19,6 @@ openai.api_key = OPENAI_API_KEY
 
 # Other constants
 TWITTER_ACCOUNT = "@DevWisdomDaily"
-THREADS_USERNAME = "devwisdomdaily"
 
 
 def check_api_keys():
@@ -271,7 +269,7 @@ def upload_media(url, API):
 
 async def post_to_threads(quote):
     threads_api = ThreadsAPI()
-    await threads_api.login(THREADS_USERNAME, THREADS_PASSWORD)
+    await threads_api.login(os.environ.get("USERNAME"), os.environ.get("PASSWORD"))
     result = await threads_api.post(quote)
 
     if result:
