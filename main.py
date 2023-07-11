@@ -327,7 +327,7 @@ def remove_hashtags(text):
     return re.sub(r"#\S+", "", text)
 
 
-def post_quote_on_threads(API):
+def post_quote_on_threads(quote):
     """
     Posts a generated quote on Instagram Threads using the environmental variables THREADS_USERNAME and THREADS_PASSWORD.
     """
@@ -375,17 +375,13 @@ def post_quote_on_threads(API):
         response.raise_for_status()
 
     try:
-        previous_quotes = get_previous_quotes(API)
-        while True:
-            quote = generate_quote(previous_quotes)
-            quote = remove_hashtags(quote)
-            print(f"Generated quote: {quote}")
+        quote = remove_hashtags(quote)
+        print(f"Quote for posting: {quote}")
 
-            token, device_id = authenticate()
+        token, device_id = authenticate()
 
-            create_text_post(token, device_id, quote)
-            print(f"Posted on Instagram Threads: {quote}")
-            break
+        create_text_post(token, device_id, quote)
+        print(f"Posted on Instagram Threads: {quote}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -428,8 +424,9 @@ def trigger_tweet(event, context):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    tweet_quote_and_image(API)
-    post_quote_on_threads(API)
+    quote, quote_text = generate_quote(API, get_previous_quotes())
+    tweet_quote_and_image(API, quote)
+    post_quote_on_threads(quote)
 
 
 def main():
@@ -440,8 +437,9 @@ def main():
     """
     check_api_keys()
     API = setup_tweepy_api()
-    tweet_quote_and_image(API)
-    post_quote_on_threads(API)
+    quote, quote_text = generate_quote(API, get_previous_quotes())
+    tweet_quote_and_image(API, quote)
+    post_quote_on_threads(quote)
 
 
 if __name__ == "__main__":
