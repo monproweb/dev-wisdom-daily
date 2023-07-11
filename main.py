@@ -283,9 +283,8 @@ def tweet_quote_and_image(API):
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
             threads = Threads(username=THREADS_USERNAME, password=THREADS_PASSWORD)
-            created_thread = threads.private_api.create_thread(caption=quote)
+            created_thread = threads.private_api.create_thread(caption=str(quote))
             print(json.dumps(created_thread, indent=4))
-            print(f"Published on Threads: {quote}")
             return True
         except tweepy.errors.Forbidden:
             print("Tweeting failed due to forbidden error. Generating a new quote...")
