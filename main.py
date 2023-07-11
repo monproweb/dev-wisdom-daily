@@ -327,7 +327,7 @@ def remove_hashtags(text):
     return re.sub(r"#\S+", "", text)
 
 
-def post_quote_on_threads():
+def post_quote_on_threads(API):
     """
     Posts a generated quote on Instagram Threads using the environmental variables THREADS_USERNAME and THREADS_PASSWORD.
     """
@@ -375,7 +375,7 @@ def post_quote_on_threads():
         response.raise_for_status()
 
     try:
-        previous_quotes = get_previous_quotes()
+        previous_quotes = get_previous_quotes(API)
         while True:
             quote = generate_quote(previous_quotes)
             quote = remove_hashtags(quote)
