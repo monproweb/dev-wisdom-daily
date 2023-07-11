@@ -283,7 +283,7 @@ def tweet_quote_and_image(API):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
-            api.publish(caption=quote, image_path=image_url)
+            api.publish(caption=quote)
             print(f"Published on Threads: {quote}")
             return True
         except tweepy.errors.Forbidden:
