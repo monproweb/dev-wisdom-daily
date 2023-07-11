@@ -281,7 +281,7 @@ async def post_to_threads(quote):
         print("Unable to post to Threads.net.")
 
 
-def tweet_quote_and_image(API):
+async def tweet_quote_and_image(API):
     """
     Tweets the given quote and an image generated based on the detailed_description.
     If the tweet fails due to a "Forbidden" error (403), a new quote is generated and the process is retried.
@@ -320,7 +320,9 @@ def tweet_quote_and_image(API):
             print(f"Uploaded media ID: {media_id}")
 
             if post_tweet(quote, media_id):
-                asyncio.run(post_to_threads(quote))
+                await post_to_threads(quote)
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(post_to_threads(quote))
                 break
 
     except Exception as e:
