@@ -424,7 +424,7 @@ def trigger_tweet(event, context):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    quote, quote_text = generate_quote(API, get_previous_quotes())
+    quote, quote_text = generate_quote(API, get_previous_quotes(API))
     tweet_quote_and_image(API, quote)
     post_quote_on_threads(quote)
 
@@ -437,7 +437,7 @@ def main():
     """
     check_api_keys()
     API = setup_tweepy_api()
-    quote, quote_text = generate_quote(API, get_previous_quotes())
+    quote, quote_text = generate_quote(API, get_previous_quotes(API))
     tweet_quote_and_image(API, quote)
     post_quote_on_threads(quote)
 
