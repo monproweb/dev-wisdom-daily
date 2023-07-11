@@ -429,7 +429,7 @@ def trigger_tweet(event, context):
     check_api_keys()
     API = setup_tweepy_api()
     tweet_quote_and_image(API)
-    post_quote_on_threads()
+    post_quote_on_threads(API)
 
 
 def main():
@@ -441,7 +441,7 @@ def main():
     check_api_keys()
     API = setup_tweepy_api()
     tweet_quote_and_image(API)
-    post_quote_on_threads()
+    post_quote_on_threads(API)
 
 
 if __name__ == "__main__":
