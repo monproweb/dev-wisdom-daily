@@ -268,7 +268,7 @@ def upload_media(url, API):
     return media.media_id_string
 
 
-def tweet_quote_and_image(API, threads_api):
+def tweet_quote_and_image(API, api):
     """
     Tweets the given quote and an image generated based on the detailed_description.
     If the tweet fails due to a "Forbidden" error (403), a new quote is generated and the process is retried.
@@ -282,7 +282,7 @@ def tweet_quote_and_image(API, threads_api):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
-            threads_api.publish(caption=quote, image_path=image_url)
+            api.publish(caption=quote, image_path=image_url)
             print(f"Published on Threads: {quote}")
             return True
         except tweepy.errors.Forbidden:
@@ -341,7 +341,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def trigger_tweet(event, context, threads_api=None):
+def trigger_tweet(event, context, api):
     """
     Triggers the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
@@ -351,21 +351,19 @@ def trigger_tweet(event, context, threads_api=None):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    if threads_api is None:
-        threads_api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
-    tweet_quote_and_image(API, threads_api)
+    api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
+    tweet_quote_and_image(API, api)
 
 
-def main(threads_api):
+def main(api):
     """
     The main function that triggers the tweet_quote_and_image() function. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
     """
     check_api_keys()
     API = setup_tweepy_api()
-    if threads_api is None:
-        threads_api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
-    tweet_quote_and_image(API, threads_api)
+    api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
+    tweet_quote_and_image(API, api)
 
 
 if __name__ == "__main__":
