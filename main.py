@@ -4,18 +4,19 @@ import tweepy
 import requests
 import re
 from io import BytesIO
-from threads_api.src.threads_api import ThreadsAPI
-import asyncio
-from dotenv import load_dotenv
-
-load_dotenv()
+from threadspy import ThreadsAPI
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
+THREADS_USERNAME = os.environ.get("THREADS_USERNAME")
+THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+# Set up Threads API
+threads_api = ThreadsAPI(username=THREADS_USERNAME, password=THREADS_PASSWORD)
 
 # Set up OpenAI API
 openai.api_key = OPENAI_API_KEY
@@ -270,32 +271,22 @@ def upload_media(url, API):
     return media.media_id_string
 
 
-async def post_to_threads(quote):
-    threads_api = ThreadsAPI()
-    await threads_api.login(os.environ.get("USERNAME"), os.environ.get("PASSWORD"))
-    result = await threads_api.post(quote)
-
-    if result:
-        print("Post has been successfully posted to Threads.net")
-    else:
-        print("Unable to post to Threads.net.")
-
-
-async def tweet_quote_and_image(API):
+def tweet_quote_and_image(API, threads_api):
     """
     Tweets the given quote and an image generated based on the detailed_description.
     If the tweet fails due to a "Forbidden" error (403), a new quote is generated and the process is retried.
 
     Args:
         API (tweepy.API): The Tweepy API object.
-        quote (str): The quote to be tweeted.
-        detailed_description (str): The detailed description for generating an image using DALL-E 2.
+        threads_api (ThreadsAPI): The ThreadsAPI object.
     """
 
     def post_tweet(quote, media_id):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
+            threads_api.publish(caption=quote, image_path=image_url)
+            print(f"Published on Threads: {quote}")
             return True
         except tweepy.errors.Forbidden:
             print("Tweeting failed due to forbidden error. Generating a new quote...")
@@ -320,9 +311,6 @@ async def tweet_quote_and_image(API):
             print(f"Uploaded media ID: {media_id}")
 
             if post_tweet(quote, media_id):
-                await post_to_threads(quote)
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(post_to_threads(quote))
                 break
 
     except Exception as e:
@@ -356,13 +344,13 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def trigger_tweet(event, context):
+def trigger_tweet(event, context, threads_api):
     """
     Triggers the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
     Args:
         event (dict): A dictionary containing data about the triggering event (not used in this function).
-        context (google.cloud.functions.Context): Metadata about the function invocation (not used in this function).
+        context (google.cloud...
     """
     check_api_keys()
     API = setup_tweepy_api()
