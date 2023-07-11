@@ -20,7 +20,7 @@ openai.api_key = OPENAI_API_KEY
 
 # Other constants
 TWITTER_ACCOUNT = "@DevWisdomDaily"
-THREADS_USERNAME = os.environ.get("devwisdomdaily")
+THREADS_USERNAME = "devwisdomdaily"
 
 
 def check_api_keys():
