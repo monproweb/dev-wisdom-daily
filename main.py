@@ -2,8 +2,6 @@ import os
 import openai
 import tweepy
 import requests
-import random
-import string
 import re
 from io import BytesIO
 
@@ -12,7 +10,6 @@ TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
-THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Set up OpenAI API
@@ -20,7 +17,6 @@ openai.api_key = OPENAI_API_KEY
 
 # Other constants
 TWITTER_ACCOUNT = "@DevWisdomDaily"
-THREADS_ACCOUNT = "devwisdomdaily"
 
 
 def check_api_keys():
@@ -314,63 +310,6 @@ def tweet_quote_and_image(API):
         handle_error(e)
 
 
-def generate_device_id():
-    return "android-" + "".join(
-        random.choices(string.ascii_lowercase + string.digits, k=13)
-    )
-
-
-def authenticate(username, password, device_id):
-    headers = {
-        "user-agent": "Barcelona 289.0.0.77.109 Android",
-        "sec-fetch-site": "same-origin",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-    }
-    data = {
-        "params": '{"client_input_params":{"password":"'
-        + password
-        + '","contact_point":"'
-        + username
-        + '","device_id":"'
-        + device_id
-        + '"},"server_params":{"credential_type":"password","device_id":"'
-        + device_id
-        + '"}}',
-        "bloks_versioning_id": "00ba6fa565c3c707243ad976fa30a071a625f2a3d158d9412091176fe35027d8",
-    }
-    response = requests.post(
-        "https://i.instagram.com/api/v1/bloks/apps/com.bloks.www.bloks.caa.login.async.send_login_request/",
-        headers=headers,
-        data=data,
-    )
-    token = response.text.split("Bearer IGT:2:")[1][:160]
-    return token
-
-
-def create_text_post(user_id, post_text, device_id, token):
-    headers = {
-        "user-agent": "Barcelona 289.0.0.77.109 Android",
-        "sec-fetch-site": "same-origin",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "authorization": "Bearer IGT:2:" + token,
-    }
-    data = {
-        "signed_body": 'SIGNATURE.{"publish_mode":"text_post","text_post_app_info":"{\\"reply_control\\":0}","timezone_offset":"0","source_type":"4","_uid":"'
-        + user_id
-        + '","device_id":"'
-        + device_id
-        + '","caption":"'
-        + post_text
-        + '","device":{"manufacturer":"OnePlus","model":"ONEPLUS+A3003","android_version":26,"android_release":"8.1.0"}}'
-    }
-    response = requests.post(
-        "https://i.instagram.com/api/v1/media/configure_text_only_post/",
-        headers=headers,
-        data=data,
-    )
-    return response.text
-
-
 def handle_error(e):
     """
     Handle various errors that may occur during interaction with the Twitter and OpenAI APIs.
@@ -408,24 +347,7 @@ def trigger_tweet(event, context):
     """
     check_api_keys()
     API = setup_tweepy_api()
-
-    previous_quotes = get_previous_quotes(API)
-    previous_quotes_text = "\n".join(previous_quotes)
-
-    quote, quote_text = generate_quote(API, previous_quotes_text)
-    print(f"Generated quote: {quote}")
-
-    post_text = quote_text
-
-    device_id = generate_device_id()
-    username = THREADS_ACCOUNT
-    password = THREADS_PASSWORD
-    user_id = "60617589697"
-
-    token = authenticate(username, password, device_id)
-    response = create_text_post(user_id, post_text, device_id, token)
-
-    print(response)
+    tweet_quote_and_image(API)
 
 
 def main():
@@ -435,24 +357,7 @@ def main():
     """
     check_api_keys()
     API = setup_tweepy_api()
-
-    previous_quotes = get_previous_quotes(API)
-    previous_quotes_text = "\n".join(previous_quotes)
-
-    quote, quote_text = generate_quote(API, previous_quotes_text)
-    print(f"Generated quote: {quote}")
-
-    post_text = quote_text
-
-    device_id = generate_device_id()
-    username = THREADS_ACCOUNT
-    password = THREADS_PASSWORD
-    user_id = "60617589697"
-
-    token = authenticate(username, password, device_id)
-    response = create_text_post(user_id, post_text, device_id, token)
-
-    print(response)
+    tweet_quote_and_image(API)
 
 
 if __name__ == "__main__":
