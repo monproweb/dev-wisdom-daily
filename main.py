@@ -15,9 +15,6 @@ THREADS_USERNAME = os.environ.get("THREADS_USERNAME")
 THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-# Set up Threads API
-threads_api = ThreadsAPI(username=THREADS_USERNAME, password=THREADS_PASSWORD)
-
 # Set up OpenAI API
 openai.api_key = OPENAI_API_KEY
 
@@ -354,17 +351,19 @@ def trigger_tweet(event, context, threads_api):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    tweet_quote_and_image(API)
+    threads_api = ThreadsAPI(username=THREADS_USERNAME, password=THREADS_PASSWORD)
+    tweet_quote_and_image(API, threads_api)
 
 
-def main():
+def main(threads_api):
     """
     The main function that triggers the tweet_quote_and_image() function. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
     """
     check_api_keys()
     API = setup_tweepy_api()
-    tweet_quote_and_image(API)
+    threads_api = ThreadsAPI(username=THREADS_USERNAME, password=THREADS_PASSWORD)
+    tweet_quote_and_image(API, threads_api)
 
 
 if __name__ == "__main__":
