@@ -4,7 +4,8 @@ import tweepy
 import requests
 import re
 from io import BytesIO
-from threadspy import ThreadsAPI
+import json
+from threads import Threads
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
@@ -281,8 +282,9 @@ def tweet_quote_and_image(API):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
-            api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
-            api.publish(caption=quote)
+            threads = Threads(username=THREADS_USERNAME, password=THREADS_PASSWORD)
+            created_thread = threads.private_api.create_thread(caption=quote)
+            print(json.dumps(created_thread, indent=4))
             print(f"Published on Threads: {quote}")
             return True
         except tweepy.errors.Forbidden:
