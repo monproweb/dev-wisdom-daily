@@ -4,16 +4,12 @@ import tweepy
 import requests
 import re
 from io import BytesIO
-import json
-from threads import Threads
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
-THREADS_USERNAME = os.environ.get("THREADS_USERNAME")
-THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Set up OpenAI API
@@ -89,7 +85,7 @@ def extract_quote_from_tweet(tweet):
 
 def generate_quote(API, previous_quotes_text):
     """
-    Generates a developer quote using OpenAI GPT-4, ensuring that the generated quote is not too similar
+    Generates a developer quote using OpenAI GPT-3.5 Turbo, ensuring that the generated quote is not too similar
     to any previously tweeted quotes.
 
     Args:
@@ -119,7 +115,7 @@ def generate_quote(API, previous_quotes_text):
         ]
 
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=chat_messages,
             n=1,
             stop=None,
@@ -191,7 +187,7 @@ def get_image_examples():
 
 def generate_detailed_description(quote_text, examples):
     """
-    Generates a detailed description for an image using OpenAI GPT-4 based on the given quote_text.
+    Generates a detailed description for an image using OpenAI GPT-3.5 Turbo based on the given quote_text.
 
     Args:
         quote_text (str): The quote text to base the image description on.
@@ -218,7 +214,7 @@ def generate_detailed_description(quote_text, examples):
     ]
 
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=chat_messages,
         n=1,
         stop=None,
@@ -276,15 +272,14 @@ def tweet_quote_and_image(API):
 
     Args:
         API (tweepy.API): The Tweepy API object.
+        quote (str): The quote to be tweeted.
+        detailed_description (str): The detailed description for generating an image using DALL-E 2.
     """
 
     def post_tweet(quote, media_id):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
-            threads = Threads(username=THREADS_USERNAME, password=THREADS_PASSWORD)
-            created_thread = threads.private_api.create_thread(caption=quote)
-            print(json.dumps(created_thread, indent=4))
             return True
         except tweepy.errors.Forbidden:
             print("Tweeting failed due to forbidden error. Generating a new quote...")
@@ -348,7 +343,7 @@ def trigger_tweet(event, context):
 
     Args:
         event (dict): A dictionary containing data about the triggering event (not used in this function).
-        context (google.cloud...
+        context (google.cloud.functions.Context): Metadata about the function invocation (not used in this function).
     """
     check_api_keys()
     API = setup_tweepy_api()
