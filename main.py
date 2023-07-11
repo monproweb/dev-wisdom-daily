@@ -6,6 +6,9 @@ import re
 from io import BytesIO
 from threads_api.src.threads_api import ThreadsAPI
 import asyncio
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Retrieve API keys and access tokens
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
