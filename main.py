@@ -51,7 +51,7 @@ def setup_tweepy_api():
 
 def get_previous_quotes(API):
     """
-    Fetches the 20 latest quotes tweeted by the specified Twitter account.
+    Fetches the 10 latest quotes tweeted by the specified Twitter account.
 
     Args:
         API (tweepy.API): An instance of the Tweepy API object.
@@ -62,9 +62,9 @@ def get_previous_quotes(API):
     all_tweets = tweepy.Cursor(
         API.user_timeline,
         screen_name=TWITTER_ACCOUNT,
-        count=20,
+        count=10,
         tweet_mode="extended",
-    ).items(20)
+    ).items(10)
 
     return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
 
