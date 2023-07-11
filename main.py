@@ -275,7 +275,6 @@ def tweet_quote_and_image(API):
 
     Args:
         API (tweepy.API): The Tweepy API object.
-        threads_api (ThreadsAPI): The ThreadsAPI object.
     """
 
     api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
