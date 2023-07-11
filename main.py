@@ -2,6 +2,8 @@ import os
 import openai
 import tweepy
 import requests
+import random
+import string
 import re
 from io import BytesIO
 
@@ -11,6 +13,8 @@ TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+THREADS_USERNAME = os.environ.get("THREADS_USERNAME")
+THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
 
 # Set up OpenAI API
 openai.api_key = OPENAI_API_KEY
@@ -310,6 +314,85 @@ def tweet_quote_and_image(API):
         handle_error(e)
 
 
+def remove_hashtags(text):
+    """
+    Removes all hashtags from a text.
+
+    Args:
+        text (str): The text from which hashtags are to be removed.
+
+    Returns:
+        str: The text without hashtags.
+    """
+    return re.sub(r"#\S+", "", text)
+
+
+def post_quote_on_threads():
+    """
+    Posts a generated quote on Instagram Threads using the environmental variables THREADS_USERNAME and THREADS_PASSWORD.
+    """
+
+    def authenticate():
+        device_id = "android-" + "".join(
+            random.choices(string.ascii_lowercase + string.digits, k=13)
+        )
+        headers = {
+            "user-agent": "Barcelona 289.0.0.77.109 Android",
+            "sec-fetch-site": "same-origin",
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+        }
+        data = {
+            "params": {
+                "client_input_params": {
+                    "password": THREADS_PASSWORD,
+                    "contact_point": THREADS_USERNAME,
+                    "device_id": device_id,
+                },
+                "server_params": {
+                    "credential_type": "password",
+                    "device_id": device_id,
+                },
+            },
+            "bloks_versioning_id": "00ba6fa565c3c707243ad976fa30a071a625f2a3d158d9412091176fe35027d8",
+        }
+        url = "https://i.instagram.com/api/v1/bloks/apps/com.bloks.www.bloks.caa.login.async.send_login_request/"
+        response = requests.post(url, headers=headers, data=data)
+        response.raise_for_status()
+        return response.json()["token"], device_id
+
+    def create_text_post(token, device_id, text):
+        headers = {
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "user-agent": "Barcelona 289.0.0.77.109 Android",
+            "authorization": f"Bearer IGT:2:{token}",
+            "sec-fetch-site": "same-origin",
+        }
+        data = {
+            "signed_body": f'SIGNATURE.{{"publish_mode":"text_post","text_post_app_info":"{{\\"reply_control\\":0}}","timezone_offset":"0","source_type":"4","_uid":"{user_id}","device_id":"{device_id}","caption":"{text}","device":{{"manufacturer":"OnePlus","model":"ONEPLUS+A3003","android_version":26,"android_release":"8.1.0"}}}}'
+        }
+        url = "https://i.instagram.com/api/v1/media/configure_text_only_post/"
+        response = requests.post(url, headers=headers, data=data)
+        response.raise_for_status()
+
+    try:
+        previous_quotes = get_previous_quotes()  # You need to define this function
+        while True:
+            quote, quote_text = generate_quote(
+                previous_quotes
+            )  # You need to define this function
+            quote = remove_hashtags(quote)  # Remove hashtags from the quote
+            print(f"Generated quote: {quote}")
+
+            token, device_id = authenticate()
+
+            create_text_post(token, device_id, quote)
+            print(f"Posted on Instagram Threads: {quote}")
+            break
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 def handle_error(e):
     """
     Handle various errors that may occur during interaction with the Twitter and OpenAI APIs.
@@ -348,16 +431,19 @@ def trigger_tweet(event, context):
     check_api_keys()
     API = setup_tweepy_api()
     tweet_quote_and_image(API)
+    post_quote_on_threads()
 
 
 def main():
     """
     The main function that triggers the tweet_quote_and_image() function. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
+    It also posts the generated quote on Instagram Threads.
     """
     check_api_keys()
     API = setup_tweepy_api()
     tweet_quote_and_image(API)
+    post_quote_on_threads()
 
 
 if __name__ == "__main__":
