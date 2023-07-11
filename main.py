@@ -278,7 +278,7 @@ def tweet_quote_and_image(API):
         threads_api (ThreadsAPI): The ThreadsAPI object.
     """
 
-    def post_tweet(quote, media_id, api):
+    def post_tweet(quote, media_id):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
@@ -342,7 +342,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def trigger_tweet(event, context, api):
+def trigger_tweet(event, context):
     """
     Triggers the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
