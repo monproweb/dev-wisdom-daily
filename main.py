@@ -268,7 +268,7 @@ def upload_media(url, API):
     return media.media_id_string
 
 
-def tweet_quote_and_image(API, api):
+def tweet_quote_and_image(API):
     """
     Tweets the given quote and an image generated based on the detailed_description.
     If the tweet fails due to a "Forbidden" error (403), a new quote is generated and the process is retried.
@@ -278,10 +278,11 @@ def tweet_quote_and_image(API, api):
         threads_api (ThreadsAPI): The ThreadsAPI object.
     """
 
-    def post_tweet(quote, media_id):
+    def post_tweet(quote, media_id, api):
         try:
             API.update_status(status=quote, media_ids=[media_id])
             print(f"Tweeted: {quote}")
+            api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
             api.publish(caption=quote, image_path=image_url)
             print(f"Published on Threads: {quote}")
             return True
@@ -341,7 +342,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def trigger_tweet(event, context, api):
+def trigger_tweet(event, context):
     """
     Triggers the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
@@ -351,19 +352,17 @@ def trigger_tweet(event, context, api):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
-    tweet_quote_and_image(API, api)
+    tweet_quote_and_image(API)
 
 
-def main(api):
+def main():
     """
     The main function that triggers the tweet_quote_and_image() function. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
     """
     check_api_keys()
     API = setup_tweepy_api()
-    api = ThreadsAPI(THREADS_USERNAME, THREADS_PASSWORD)
-    tweet_quote_and_image(API, api)
+    tweet_quote_and_image(API)
 
 
 if __name__ == "__main__":
