@@ -12,15 +12,15 @@ TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-THREADS_USERNAME = os.environ.get("THREADS_USERNAME")
 THREADS_PASSWORD = os.environ.get("THREADS_PASSWORD")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Set up OpenAI API
 openai.api_key = OPENAI_API_KEY
 
 # Other constants
 TWITTER_ACCOUNT = "@DevWisdomDaily"
+THREADS_ACCOUNT = "devwisdomdaily"
 
 
 def check_api_keys():
@@ -314,77 +314,61 @@ def tweet_quote_and_image(API):
         handle_error(e)
 
 
-def remove_hashtags(text):
-    """
-    Removes all hashtags from a text.
-
-    Args:
-        text (str): The text from which hashtags are to be removed.
-
-    Returns:
-        str: The text without hashtags.
-    """
-    return re.sub(r"#\S+", "", text)
+def generate_device_id():
+    return "android-" + "".join(
+        random.choices(string.ascii_lowercase + string.digits, k=13)
+    )
 
 
-def post_quote_on_threads(quote):
-    """
-    Posts a generated quote on Instagram Threads using the environmental variables THREADS_USERNAME and THREADS_PASSWORD.
-    """
+def authenticate(username, password, device_id):
+    headers = {
+        "user-agent": "Barcelona 289.0.0.77.109 Android",
+        "sec-fetch-site": "same-origin",
+        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    }
+    data = {
+        "params": '{"client_input_params":{"password":"'
+        + password
+        + '","contact_point":"'
+        + username
+        + '","device_id":"'
+        + device_id
+        + '"},"server_params":{"credential_type":"password","device_id":"'
+        + device_id
+        + '"}}',
+        "bloks_versioning_id": "00ba6fa565c3c707243ad976fa30a071a625f2a3d158d9412091176fe35027d8",
+    }
+    response = requests.post(
+        "https://i.instagram.com/api/v1/bloks/apps/com.bloks.www.bloks.caa.login.async.send_login_request/",
+        headers=headers,
+        data=data,
+    )
+    token = response.text.split("Bearer IGT:2:")[1][:160]
+    return token
 
-    def authenticate():
-        device_id = "android-" + "".join(
-            random.choices(string.ascii_lowercase + string.digits, k=13)
-        )
-        headers = {
-            "user-agent": "Barcelona 289.0.0.77.109 Android",
-            "sec-fetch-site": "same-origin",
-            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        }
-        data = {
-            "params": {
-                "client_input_params": {
-                    "password": THREADS_PASSWORD,
-                    "contact_point": THREADS_USERNAME,
-                    "device_id": device_id,
-                },
-                "server_params": {
-                    "credential_type": "password",
-                    "device_id": device_id,
-                },
-            },
-            "bloks_versioning_id": "00ba6fa565c3c707243ad976fa30a071a625f2a3d158d9412091176fe35027d8",
-        }
-        url = "https://i.instagram.com/api/v1/bloks/apps/com.bloks.www.bloks.caa.login.async.send_login_request/"
-        response = requests.post(url, headers=headers, data=data)
-        response.raise_for_status()
-        return response.json()["token"], device_id
 
-    def create_text_post(token, device_id, text):
-        headers = {
-            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "user-agent": "Barcelona 289.0.0.77.109 Android",
-            "authorization": f"Bearer IGT:2:{token}",
-            "sec-fetch-site": "same-origin",
-        }
-        data = {
-            "signed_body": f'SIGNATURE.{{"publish_mode":"text_post","text_post_app_info":"{{\\"reply_control\\":0}}","timezone_offset":"0","source_type":"4","_uid":"{user_id}","device_id":"{device_id}","caption":"{text}","device":{{"manufacturer":"OnePlus","model":"ONEPLUS+A3003","android_version":26,"android_release":"8.1.0"}}}}'
-        }
-        url = "https://i.instagram.com/api/v1/media/configure_text_only_post/"
-        response = requests.post(url, headers=headers, data=data)
-        response.raise_for_status()
-
-    try:
-        quote = remove_hashtags(quote)
-        print(f"Quote for posting: {quote}")
-
-        token, device_id = authenticate()
-
-        create_text_post(token, device_id, quote)
-        print(f"Posted on Instagram Threads: {quote}")
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
+def create_text_post(user_id, post_text, device_id, token):
+    headers = {
+        "user-agent": "Barcelona 289.0.0.77.109 Android",
+        "sec-fetch-site": "same-origin",
+        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "authorization": "Bearer IGT:2:" + token,
+    }
+    data = {
+        "signed_body": 'SIGNATURE.{"publish_mode":"text_post","text_post_app_info":"{\\"reply_control\\":0}","timezone_offset":"0","source_type":"4","_uid":"'
+        + user_id
+        + '","device_id":"'
+        + device_id
+        + '","caption":"'
+        + post_text
+        + '","device":{"manufacturer":"OnePlus","model":"ONEPLUS+A3003","android_version":26,"android_release":"8.1.0"}}'
+    }
+    response = requests.post(
+        "https://i.instagram.com/api/v1/media/configure_text_only_post/",
+        headers=headers,
+        data=data,
+    )
+    return response.text
 
 
 def handle_error(e):
@@ -424,22 +408,51 @@ def trigger_tweet(event, context):
     """
     check_api_keys()
     API = setup_tweepy_api()
-    quote, quote_text = generate_quote(API, get_previous_quotes())
-    tweet_quote_and_image(API, quote)
-    post_quote_on_threads(quote)
+
+    previous_quotes = get_previous_quotes(API)
+    previous_quotes_text = "\n".join(previous_quotes)
+
+    quote, quote_text = generate_quote(API, previous_quotes_text)
+    print(f"Generated quote: {quote}")
+
+    post_text = quote_text
+
+    device_id = generate_device_id()
+    username = THREADS_ACCOUNT
+    password = THREADS_PASSWORD
+    user_id = "60617589697"
+
+    token = authenticate(username, password, device_id)
+    response = create_text_post(user_id, post_text, device_id, token)
+
+    print(response)
 
 
 def main():
     """
     The main function that triggers the tweet_quote_and_image() function. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
-    It also posts the generated quote on Instagram Threads.
     """
     check_api_keys()
     API = setup_tweepy_api()
-    quote, quote_text = generate_quote(API, get_previous_quotes())
-    tweet_quote_and_image(API, quote)
-    post_quote_on_threads(quote)
+
+    previous_quotes = get_previous_quotes(API)
+    previous_quotes_text = "\n".join(previous_quotes)
+
+    quote, quote_text = generate_quote(API, previous_quotes_text)
+    print(f"Generated quote: {quote}")
+
+    post_text = quote_text
+
+    device_id = generate_device_id()
+    username = THREADS_ACCOUNT
+    password = THREADS_PASSWORD
+    user_id = "60617589697"
+
+    token = authenticate(username, password, device_id)
+    response = create_text_post(user_id, post_text, device_id, token)
+
+    print(response)
 
 
 if __name__ == "__main__":
