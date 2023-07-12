@@ -80,7 +80,7 @@ def generate_quote(API):
         chat_messages = [
             {
                 "role": "user",
-                "content": "Craft a random, captivating, and concise quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. Make sure the quote resonates with the tech community. Add 1-2 relevant hashtags and emojis to increase engagement. Start with the quote itself, followed by the name, emojis and end with hashtags.",
+                "content": "Share an intriguing and succinct quote that embodies the essence of a renowned figure in the tech industry, be it a developer, engineer, or software expert. Ensure the quote strikes a chord within the tech community. Enhance engagement by incorporating 1-2 appropriate hashtags and emojis. Begin with the quote, followed by the individual's name and emojis, concluding with the relevant hashtags.",
             },
         ]
 
@@ -113,7 +113,7 @@ def generate_detailed_description(quote_text):
     chat_messages = [
         {
             "role": "user",
-            "content": f"Create a detailed and imaginative image inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
+            "content": f"Imagine a vivid and intricate visual representation that is deeply inspired by the quote \"{quote_text}\". This image should be rich in detail, allowing for a comprehensive exploration of the quote's meaning and emotion. Incorporate various adjectives, locations, or artistic styles to enhance the image's depth and appeal. Additionally, consider infusing the image with surreal or fantastical elements to make it even more captivating. Your goal is to create a scene or metaphor that is both imaginative and engaging, drawing the viewer into a world that reflects the essence of the quote.",
         },
     ]
 
