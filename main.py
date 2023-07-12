@@ -49,26 +49,6 @@ def setup_tweepy_api():
     return tweepy.API(auth, wait_on_rate_limit=True)
 
 
-def get_previous_quotes(API):
-    """
-    Fetches the 10 latest quotes tweeted by the specified Twitter account.
-
-    Args:
-        API (tweepy.API): An instance of the Tweepy API object.
-
-    Returns:
-        list[str]: A list of previous quotes.
-    """
-    all_tweets = tweepy.Cursor(
-        API.user_timeline,
-        screen_name=TWITTER_ACCOUNT,
-        count=10,
-        tweet_mode="extended",
-    ).items(10)
-
-    return [extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
-
-
 def extract_quote_from_tweet(tweet):
     """
     Extracts the quote text from the given tweet text.
@@ -101,12 +81,8 @@ def generate_quote(API, previous_quotes_text):
     while True:
         chat_messages = [
             {
-                "role": "assistant",
-                "content": f"Here are some previous quotes posted by DevWisdomDaily:\n{previous_quotes_text}",
-            },
-            {
                 "role": "user",
-                "content": "Craft a unique, captivating, and concise quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. Make sure the quote differs from previous ones and resonates with the tech community. Add 1-2 relevant hashtags and emojis to increase engagement. Start with the quote itself, followed by the name, emojis and end with hashtags.",
+                "content": "Craft a random, captivating, and concise quote from a notable tech personality, such as a developer, engineer, or software expert, including their name. Make sure the quote resonates with the tech community. Add 1-2 relevant hashtags and emojis to increase engagement. Start with the quote itself, followed by the name, emojis and end with hashtags.",
             },
         ]
 
@@ -138,12 +114,8 @@ def generate_detailed_description(quote_text):
 
     chat_messages = [
         {
-            "role": "system",
-            "content": "Your task is to create engaging, visually striking, and creative images based on quotes.",
-        },
-        {
             "role": "user",
-            "content": f"Create a detailed and imaginative image. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
+            "content": f"Create a detailed and imaginative image inspired by the quote '{quote_text}'. Include adjectives, locations, or artistic styles, and consider incorporating surreal or fantastical elements to make the image more engaging. Draw from the quote's meaning or emotion to create a vivid scene or metaphor. Please provide the description without line breaks.",
         },
     ]
 
@@ -220,11 +192,8 @@ def tweet_quote_and_image(API):
             return False
 
     try:
-        previous_quotes = get_previous_quotes(API)
-        previous_quotes_text = "\n".join(previous_quotes)
-
         while True:
-            quote, quote_text = generate_quote(API, previous_quotes_text)
+            quote, quote_text = generate_quote(API)
             print(f"Generated quote: {quote}")
 
             detailed_description = generate_detailed_description(quote_text)
