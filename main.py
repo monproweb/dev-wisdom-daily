@@ -63,7 +63,7 @@ def extract_quote_from_tweet(tweet):
     return match.group(0) if match else ""
 
 
-def generate_quote():
+def generate_quote(API):
     """
     Generates a developer quote using OpenAI GPT-4.
 
