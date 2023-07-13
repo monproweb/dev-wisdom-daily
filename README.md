@@ -1,6 +1,6 @@
-# 🤖 Developer Quote Twitter Bot
+# 🤖 Developer Quote Threads/Twitter Bot
 
-This is a Twitter bot that generates and tweets developer quotes along with an image based on the description provided by the quote.
+This is a Threads/Twitter bot that generates and thread/tweets developer quotes along with an image based on the description provided by the quote.
 
 ## 🚀 Technologies Used
 
@@ -15,6 +15,7 @@ This is a Twitter bot that generates and tweets developer quotes along with an i
 ## 📋 Prerequisites
 
 - Python 3.6 or higher
+- A Instagram account without 2FA
 - A Twitter Developer account with API keys and access tokens
 - An OpenAI API key
 
