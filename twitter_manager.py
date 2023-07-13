@@ -114,6 +114,8 @@ def tweet_quote_and_image(client, API, config):
         media_id = upload_media(image_url, API)
         print(f"Uploaded media ID: {media_id}")
 
+        quote_without_hashtags = re.sub(r"#\S+", "", quote)
+
         client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
 
@@ -126,7 +128,7 @@ def tweet_quote_and_image(client, API, config):
         print(f"Temp file name: {temp_filename}")
 
         created_thread = threads.private_api.create_thread(
-            caption=quote,
+            caption=quote_without_hashtags,
             image_url=temp_filename,
         )
         print(f"Posted to Threads: {created_thread}")
