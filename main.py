@@ -15,7 +15,7 @@ def trigger_tweet(event, context):
     openai.api_key = config["OPENAI_API_KEY"]
     API = setup_tweepy_api(config)
     client = setup_tweepy_client(config)
-    tweet_quote_and_image(client, API)
+    tweet_quote_and_image(client, API, config)
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
     openai.api_key = config["OPENAI_API_KEY"]
     API = setup_tweepy_api(config)
     client = setup_tweepy_client(config)
-    tweet_quote_and_image(client, API)
+    tweet_quote_and_image(client, API, config)
 
 
 if __name__ == "__main__":

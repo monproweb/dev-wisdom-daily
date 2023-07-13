@@ -2,6 +2,7 @@ import openai
 import tweepy
 import requests
 from io import BytesIO
+from PIL import Image
 from content_generator import ContentGenerator
 from threads import Threads
 
@@ -113,12 +114,14 @@ def tweet_quote_and_image(client, API, config):
         client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
 
+        response = requests.get(image_url)
+        img = Image.open(BytesIO(response.content))
+        img.save("local_image.png")
         created_thread = threads.private_api.create_thread(
             caption=quote,
-            image_url=image_url,
+            image_url="local_image.png",
         )
-        created_thread()
-        print(f"Posted to Instagram: {quote}")
+        print(f"Posted to Threads: {created_thread}")
 
     except Exception as e:
         handle_error(e)
