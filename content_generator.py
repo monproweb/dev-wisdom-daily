@@ -35,7 +35,7 @@ class ContentGenerator:
         chat_messages = [
             {
                 "role": "user",
-                "content": "Share a thought-provoking and concise quote that captures the spirit of a specific domain within the tech industry, such as artificial intelligence, web3 development, software development, cybersecurity, or data science. The quote should come from a respected figure in the specified domain and resonate within the tech community. Use 1-2 relevant hashtags and emojis to enhance engagement. Present the quote first, followed by the individual's name and emojis, and end with the appropriate hashtags. Please vary the domain, the individual, and the theme of the quote each time.",
+                "content": "Share a thought-provoking and concise quote that captures the spirit of a specific domain within the tech industry, such as artificial intelligence, web3 development, software development, game development, cybersecurity, or data science. The quote should come from a respected figure in the specified domain and resonate within the tech community. Use 1-2 relevant hashtags and emojis to enhance engagement. Present the quote first, followed by the individual's name and emojis, and end with the appropriate hashtags.",
             },
         ]
 
