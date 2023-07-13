@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 from content_generator import ContentGenerator
 from threads import Threads
+import re
 
 
 def setup_tweepy_client(config):
@@ -111,6 +112,8 @@ def tweet_quote_and_image(client, API, config):
         media_id = upload_media(image_url, API)
         print(f"Uploaded media ID: {media_id}")
 
+        quote_without_hashtags = re.sub(r"#\S+", "", quote)
+
         client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
 
@@ -118,8 +121,8 @@ def tweet_quote_and_image(client, API, config):
         img = Image.open(BytesIO(response.content))
         img.save("local_image.png")
         created_thread = threads.private_api.create_thread(
-            caption=quote,
-            image_url="local_image.png",
+            caption=quote_without_hashtags,
+            image_url=image_url,
         )
         print(f"Posted to Threads: {created_thread}")
 
