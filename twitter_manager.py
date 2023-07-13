@@ -6,6 +6,8 @@ from PIL import Image
 from content_generator import ContentGenerator
 from threads import Threads
 import re
+import tempfile
+import os
 
 
 def setup_tweepy_client(config):
@@ -95,9 +97,7 @@ def tweet_quote_and_image(client, API, config):
     """
     content_generator = ContentGenerator(client)
 
-    threads = Threads(
-        username=config["INSTAGRAM_USERNAME"], password=config["INSTAGRAM_PASSWORD"]
-    )
+    threads = Threads(username="devwisdomdaily", password=config["INSTAGRAM_PASSWORD"])
 
     try:
         quote, quote_text = content_generator.generate_quote()
@@ -114,19 +114,24 @@ def tweet_quote_and_image(client, API, config):
         media_id = upload_media(image_url, API)
         print(f"Uploaded media ID: {media_id}")
 
-        quote_without_hashtags = re.sub(r"#\S+", "", quote)
-
         client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
 
-        response = requests.get(image_url)
-        img = Image.open(BytesIO(response.content))
-        img.save("tmp/local_image.png")
+        response = requests.get(image_url, stream=True)
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+            for chunk in response.iter_content(1024):
+                temp_file.write(chunk)
+            temp_filename = temp_file.name
+
+        print(f"Temp file name: {temp_filename}")
+
         created_thread = threads.private_api.create_thread(
-            caption=quote_without_hashtags,
-            image_url=image_url,
+            caption=quote,
+            image_url=temp_filename,
         )
         print(f"Posted to Threads: {created_thread}")
+
+        os.remove(temp_filename)
 
     except Exception as e:
         handle_error(e)
