@@ -1,3 +1,4 @@
+import openai
 import tweepy
 import requests
 from io import BytesIO
