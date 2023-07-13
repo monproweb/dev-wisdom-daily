@@ -3,7 +3,7 @@ from config import get_config
 from twitter_manager import setup_tweepy_api, tweet_quote_and_image
 
 
-def trigger_tweet(event, context):
+def trigger_tweet(event, context, config):
     """
     Trigger the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
@@ -17,7 +17,7 @@ def trigger_tweet(event, context):
     tweet_quote_and_image(API)
 
 
-def main():
+def main(config):
     """
     The main function that triggers the tweet process. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
