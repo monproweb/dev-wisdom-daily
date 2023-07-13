@@ -5,6 +5,25 @@ from io import BytesIO
 from content_generator import ContentGenerator
 
 
+def setup_tweepy_client(config):
+    """
+    Set up the Tweepy Client object using the provided API keys and access tokens.
+
+    Args:
+        config (dict): A dictionary containing the API keys and access tokens.
+
+    Returns:
+        tweepy.Client: An instance of the Tweepy Client object.
+    """
+    client = tweepy.Client(
+        consumer_key=config["TWITTER_API_KEY"],
+        consumer_secret=config["TWITTER_API_SECRET"],
+        access_token=config["TWITTER_ACCESS_TOKEN"],
+        access_token_secret=config["TWITTER_ACCESS_TOKEN_SECRET"],
+    )
+    return client
+
+
 def setup_tweepy_api(config):
     """
     Set up the Tweepy API object using the provided API keys and access tokens.
@@ -19,7 +38,7 @@ def setup_tweepy_api(config):
     auth.set_access_token(
         config["TWITTER_ACCESS_TOKEN"], config["TWITTER_ACCESS_TOKEN_SECRET"]
     )
-    return tweepy.API(auth, wait_on_rate_limit=True)
+    return tweepy.API(auth)
 
 
 def upload_media(url, API):
@@ -64,14 +83,14 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def tweet_quote_and_image(API):
+def tweet_quote_and_image(client, API):
     """
     Generate a quote, a detailed description, an image, and tweet them.
 
     Args:
-        API (tweepy.API): The Tweepy API object.
+        client (tweepy.Client): The Tweepy Client object.
     """
-    content_generator = ContentGenerator(API)
+    content_generator = ContentGenerator(client)
 
     try:
         quote, quote_text = content_generator.generate_quote()
@@ -88,7 +107,7 @@ def tweet_quote_and_image(API):
         media_id = upload_media(image_url, API)
         print(f"Uploaded media ID: {media_id}")
 
-        API.update_status(status=quote, media_ids=[media_id])
+        client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
     except Exception as e:
         handle_error(e)

@@ -1,9 +1,9 @@
 import openai
 from config import get_config
-from twitter_manager import setup_tweepy_api, tweet_quote_and_image
+from twitter_manager import setup_tweepy_client, setup_tweepy_api, tweet_quote_and_image
 
 
-def trigger_tweet(event, context, config):
+def trigger_tweet(event, context):
     """
     Trigger the tweet process to generate a quote, a detailed description, and tweet them as an image.
 
@@ -14,10 +14,11 @@ def trigger_tweet(event, context, config):
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     API = setup_tweepy_api(config)
-    tweet_quote_and_image(API)
+    client = setup_tweepy_client(config)
+    tweet_quote_and_image(client, API)
 
 
-def main(config):
+def main():
     """
     The main function that triggers the tweet process. It sets up the Tweepy API,
     generates a unique quote and its corresponding image description, and tweets them as an image.
@@ -25,7 +26,8 @@ def main(config):
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     API = setup_tweepy_api(config)
-    tweet_quote_and_image(API)
+    client = setup_tweepy_client(config)
+    tweet_quote_and_image(client, API)
 
 
 if __name__ == "__main__":
