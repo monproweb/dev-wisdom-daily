@@ -121,7 +121,7 @@ def tweet_quote_and_image(client, API, config):
 
         response = requests.get(image_url)
         img = Image.open(BytesIO(response.content))
-        img.save("local_image.png")
+        img.save("tmp/local_image.png")
         created_thread = threads.private_api.create_thread(
             caption=quote_without_hashtags,
             image_url=image_url,
