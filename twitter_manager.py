@@ -3,6 +3,7 @@ import tweepy
 import requests
 from io import BytesIO
 from content_generator import ContentGenerator
+from threads import Threads
 
 
 def setup_tweepy_client(config):
@@ -83,7 +84,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def tweet_quote_and_image(client, API):
+def tweet_quote_and_image(client, API, config):
     """
     Generate a quote, a detailed description, an image, and tweet them.
 
@@ -91,6 +92,8 @@ def tweet_quote_and_image(client, API):
         client (tweepy.Client): The Tweepy Client object.
     """
     content_generator = ContentGenerator(client)
+
+    threads = Threads(username="devwisdomdaily", password=config["INSTAGRAM_PASSWORD"])
 
     try:
         quote, quote_text = content_generator.generate_quote()
@@ -109,5 +112,13 @@ def tweet_quote_and_image(client, API):
 
         client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
+
+        created_thread = threads.private_api.create_thread(
+            caption=quote,
+            image_url=image_url,
+        )
+        created_thread()
+        print(f"Posted to Instagram: {quote}")
+
     except Exception as e:
         handle_error(e)
