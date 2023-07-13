@@ -95,7 +95,9 @@ def tweet_quote_and_image(client, API, config):
     """
     content_generator = ContentGenerator(client)
 
-    threads = Threads(username="devwisdomdaily", password=config["INSTAGRAM_PASSWORD"])
+    threads = Threads(
+        username=config["INSTAGRAM_USERNAME"], password=config["INSTAGRAM_PASSWORD"]
+    )
 
     try:
         quote, quote_text = content_generator.generate_quote()

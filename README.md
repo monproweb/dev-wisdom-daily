@@ -31,7 +31,7 @@ To set up this project locally, you will need to:
    - `TWITTER_ACCESS_TOKEN_SECRET`
    - `OPENAI_API_KEY` (Follow the [official documentation](https://beta.openai.com/docs/developer-quickstart) to obtain an OpenAI API key)
    - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
-   - `username` (Set this to the username of the Instagram account you want to use for posting the threads, e.g., "devwisdomdaily")
+   - `INSTAGRAM_USERNAME` (Set this to the username of the Instagram account you want to use for posting the thread, e.g., "devwisdomdaily")
    - `INSTAGRAM_PASSWORD`
 4. Deploy the function to Google Cloud Functions
 5. Create a topic in Google Cloud Pub/Sub

@@ -20,6 +20,7 @@ def get_config():
         "TWITTER_ACCESS_TOKEN": os.getenv("TWITTER_ACCESS_TOKEN"),
         "TWITTER_ACCESS_TOKEN_SECRET": os.getenv("TWITTER_ACCESS_TOKEN_SECRET"),
         "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
+        "INSTAGRAM_USERNAME": os.getenv("INSTAGRAM_USERNAME"),
         "INSTAGRAM_PASSWORD": os.getenv("INSTAGRAM_PASSWORD"),
     }
 
