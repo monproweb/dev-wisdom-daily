@@ -5,6 +5,7 @@ This is a Twitter bot that generates and tweets developer quotes along with an i
 ## 🚀 Technologies Used
 
 - [OpenAI API](https://openai.com/)
+- [threads-net](https://github.com/dmytrostriletskyi/threads-net)
 - [Tweepy](https://www.tweepy.org/)
 - [Google Cloud Functions](https://cloud.google.com/functions)
 - [Google Cloud Scheduler](https://cloud.google.com/scheduler)
@@ -30,6 +31,8 @@ To set up this project locally, you will need to:
    - `TWITTER_ACCESS_TOKEN_SECRET`
    - `OPENAI_API_KEY` (Follow the [official documentation](https://beta.openai.com/docs/developer-quickstart) to obtain an OpenAI API key)
    - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
+   - `username` (Set this to the username of the Instagram account you want to use for posting the threads, e.g., "devwisdomdaily")
+   - `INSTAGRAM_PASSWORD`
 4. Deploy the function to Google Cloud Functions
 5. Create a topic in Google Cloud Pub/Sub
 6. Create a subscription for the topic
@@ -37,7 +40,7 @@ To set up this project locally, you will need to:
 
 ## 🎯 Usage
 
-Once the project is set up, the bot will automatically tweet a new developer quote with an image at the specified intervals set up in the Cloud Scheduler job.
+Once the project is set up, the bot will automatically tweet/thread a new developer quote with an image at the specified intervals set up in the Cloud Scheduler job.
 
 ## 🤝 Contributing
 
