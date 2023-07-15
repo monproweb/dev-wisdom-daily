@@ -61,6 +61,16 @@ def tweet_quote_and_image(client, API, config):
             settings = json.load(settings_file)
 
     try:
+        threads = Threads(
+            username="devwisdomdaily",
+            password=config["INSTAGRAM_PASSWORD"],
+            settings=settings,
+        )
+    except Exception as e:
+        print("An error occurred while setting up Threads: ", e)
+        threads = None
+
+    try:
         quote, quote_text = content_generator.generate_quote()
         print(f"Generated quote: {quote}")
 
@@ -82,41 +92,30 @@ def tweet_quote_and_image(client, API, config):
 
     except Exception as e:
         handle_error(e)
-        print(
-            "An error occurred while trying to tweet. Attempting to tweet without media..."
-        )
+
+    if threads:
         try:
-            client.create_tweet(text=quote)
-            print(f"Tweeted: {quote}")
+            response = requests.get(image_url, stream=True)
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+                for chunk in response.iter_content(1024):
+                    temp_file.write(chunk)
+                temp_filename = temp_file.name
+
+            print(f"Temp file name: {temp_filename}")
+
+            with open(temp_filename, "rb") as image_file:
+                created_thread = threads.private_api.create_thread(
+                    caption=quote_without_hashtags,
+                    image_file=image_file,
+                )
+            print(f"Posted to Threads: {created_thread}")
+
+            os.remove(temp_filename)
+
+            with open("settings.json", "w") as settings_file:
+                json.dump(threads.private_api.get_settings(), settings_file)
+
         except Exception as e:
-            print("An error occurred while trying to tweet without media: ", e)
-
-    try:
-        threads = Threads(
-            username="devwisdomdaily",
-            password=config["INSTAGRAM_PASSWORD"],
-            settings=settings,
-        )
-
-        response = requests.get(image_url, stream=True)
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
-            for chunk in response.iter_content(1024):
-                temp_file.write(chunk)
-            temp_filename = temp_file.name
-
-        print(f"Temp file name: {temp_filename}")
-
-        with open(temp_filename, "rb") as image_file:
-            created_thread = threads.private_api.create_thread(
-                caption=quote_without_hashtags,
-                image_file=image_file,
-            )
-        print(f"Posted to Threads: {created_thread}")
-
-        os.remove(temp_filename)
-
-        with open("settings.json", "w") as settings_file:
-            json.dump(threads.private_api.get_settings(), settings_file)
-
-    except Exception as e:
-        print("An error occurred while interacting with Threads: ", e)
+            print("An error occurred while interacting with Threads: ", e)
+    else:
+        print("Threads was not set up correctly.")
