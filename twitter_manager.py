@@ -8,6 +8,7 @@ from threads import Threads
 import re
 import tempfile
 import os
+import json
 
 
 def setup_tweepy_client(config):
@@ -97,7 +98,16 @@ def tweet_quote_and_image(client, API, config):
     """
     content_generator = ContentGenerator(client)
 
-    threads = Threads(username="devwisdomdaily", password=config["INSTAGRAM_PASSWORD"])
+    settings = None
+    if os.path.exists("settings.json"):
+        with open("settings.json", "r") as settings_file:
+            settings = json.load(settings_file)
+
+    threads = Threads(
+        username="devwisdomdaily",
+        password=config["INSTAGRAM_PASSWORD"],
+        settings=settings,
+    )
 
     try:
         quote, quote_text = content_generator.generate_quote()
@@ -119,6 +129,10 @@ def tweet_quote_and_image(client, API, config):
         client.create_tweet(text=quote, media_ids=[media_id])
         print(f"Tweeted: {quote}")
 
+    except Exception as e:
+        handle_error(e)
+
+    try:
         response = requests.get(image_url, stream=True)
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
             for chunk in response.iter_content(1024):
@@ -127,13 +141,17 @@ def tweet_quote_and_image(client, API, config):
 
         print(f"Temp file name: {temp_filename}")
 
-        created_thread = threads.private_api.create_thread(
-            caption=quote_without_hashtags,
-            image_url=temp_filename,
-        )
+        with open(temp_filename, "rb") as image_file:
+            created_thread = threads.private_api.create_thread(
+                caption=quote_without_hashtags,
+                image_file=image_file,
+            )
         print(f"Posted to Threads: {created_thread}")
 
         os.remove(temp_filename)
 
+        with open("settings.json", "w") as settings_file:
+            json.dump(threads.private_api.get_settings(), settings_file)
+
     except Exception as e:
-        handle_error(e)
+        print("An error occurred while interacting with Threads: ", e)
