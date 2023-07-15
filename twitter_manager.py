@@ -60,12 +60,6 @@ def tweet_quote_and_image(client, API, config):
         with open("settings.json", "r") as settings_file:
             settings = json.load(settings_file)
 
-    threads = Threads(
-        username="devwisdomdaily",
-        password=config["INSTAGRAM_PASSWORD"],
-        settings=settings,
-    )
-
     try:
         quote, quote_text = content_generator.generate_quote()
         print(f"Generated quote: {quote}")
@@ -88,8 +82,22 @@ def tweet_quote_and_image(client, API, config):
 
     except Exception as e:
         handle_error(e)
+        print(
+            "An error occurred while trying to tweet. Attempting to tweet without media..."
+        )
+        try:
+            client.create_tweet(text=quote)
+            print(f"Tweeted: {quote}")
+        except Exception as e:
+            print("An error occurred while trying to tweet without media: ", e)
 
     try:
+        threads = Threads(
+            username="devwisdomdaily",
+            password=config["INSTAGRAM_PASSWORD"],
+            settings=settings,
+        )
+
         response = requests.get(image_url, stream=True)
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
             for chunk in response.iter_content(1024):
@@ -112,10 +120,3 @@ def tweet_quote_and_image(client, API, config):
 
     except Exception as e:
         print("An error occurred while interacting with Threads: ", e)
-
-    except Exception as e:
-        try:
-            client.create_tweet(text=quote)
-            print(f"Tweeted: {quote}")
-        except Exception as e:
-            print("An error occurred while trying to tweet: ", e)
