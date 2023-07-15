@@ -55,16 +55,9 @@ def handle_error(e):
 def tweet_quote_and_image(client, API, config):
     content_generator = ContentGenerator(client)
 
-    settings = None
-    if os.path.exists("settings.json"):
-        with open("settings.json", "r") as settings_file:
-            settings = json.load(settings_file)
-
     try:
         threads = Threads(
-            username="devwisdomdaily",
-            password=config["INSTAGRAM_PASSWORD"],
-            settings=settings,
+            username="devwisdomdaily", password=config["INSTAGRAM_PASSWORD"]
         )
     except Exception as e:
         print("An error occurred while setting up Threads: ", e)
@@ -111,9 +104,6 @@ def tweet_quote_and_image(client, API, config):
             print(f"Posted to Threads: {created_thread}")
 
             os.remove(temp_filename)
-
-            with open("settings.json", "w") as settings_file:
-                json.dump(threads.private_api.get_settings(), settings_file)
 
         except Exception as e:
             print("An error occurred while interacting with Threads: ", e)
