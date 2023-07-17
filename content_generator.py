@@ -45,7 +45,7 @@ class ContentGenerator:
         match = re.search(r'"(.*?)"', tweet)
         return match.group(0) if match else ""
 
-    def generate_quote(self):
+    def generate_quote(self, previous_quotes_text):
         """
         Generate a developer quote using OpenAI GPT-4.
 
@@ -53,6 +53,10 @@ class ContentGenerator:
             tuple: A tuple containing the generated quote formatted for a tweet and the extracted quote text.
         """
         chat_messages = [
+            {
+                "role": "assistant",
+                "content": f"Here are some previous quotes posted by DevWisdomDaily:\n{previous_quotes_text}",
+            },
             {
                 "role": "user",
                 "content": "Share a thought-provoking and concise quote that captures the spirit of a specific domain within the tech industry, such as artificial intelligence, web3 development, software development, game development, cybersecurity, or data science. The quote should come from a respected figure in the specified domain and resonate within the tech community. Use 1-2 relevant hashtags and emojis to enhance engagement. Present the quote first, followed by the individual's name and emojis, and end with the appropriate hashtags.",
