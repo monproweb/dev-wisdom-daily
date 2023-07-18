@@ -1,37 +1,40 @@
 import re
 import openai
+import requests
+import json
 
 
 class ContentGenerator:
-    def __init__(self, client):
+    def __init__(self, bearer_token):
         """
-        Initialize the ContentGenerator with a Tweepy API object.
+        Initialize the ContentGenerator with a Bearer token.
 
         Args:
-            api (tweepy.API): The Tweepy API object.
+            bearer_token (str): The Bearer token for Twitter API.
         """
-        self.client = client
+        self.bearer_token = bearer_token
 
     def get_previous_quotes(self):
         """
         Fetches the latest tweets from the specified Twitter account and extracts the quotes from them.
 
-        This method uses the Tweepy Client to fetch the most recent tweets from the "@DevWisdomDaily" account.
+        This method uses the Twitter API to fetch the most recent tweets from the "@DevWisdomDaily" account.
         It then uses the `extract_quote_from_tweet` method to extract the quote from each tweet text.
 
         Returns:
             list[str]: A list of quotes extracted from the last 50 tweets.
         """
-        user = self.client.get_user(username="DevWisdomDaily")
-        user_id = user.data["id"]
+        headers = {"Authorization": f"Bearer {self.bearer_token}"}
+        url = f"https://api.twitter.com/2/users/by/username/DevWisdomDaily/tweets"
+        response = requests.get(url, headers=headers)
+        data = json.loads(response.text)
 
-        all_tweets = self.client.get_users_tweets(
-            id=user_id,
-            tweet_fields="text",
-            max_results=50,
-        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Request returned an error: {response.status_code}, {response.text}"
+            )
 
-        return [self.extract_quote_from_tweet(tweet["tweet"]) for tweet in all_tweets]
+        return [self.extract_quote_from_tweet(tweet["text"]) for tweet in data["data"]]
 
     def extract_quote_from_tweet(self, tweet):
         """

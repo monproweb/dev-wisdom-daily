@@ -1,44 +1,35 @@
 import openai
-import tweepy
 import requests
+import json
 from io import BytesIO
 from content_generator import ContentGenerator
 from threads import Threads
 import re
 import tempfile
 import os
+import base64
+from requests.structures import CaseInsensitiveDict
 
 
-def setup_tweepy_client(config):
-    client = tweepy.Client(
-        consumer_key=config["TWITTER_API_KEY"],
-        consumer_secret=config["TWITTER_API_SECRET"],
-        access_token=config["TWITTER_ACCESS_TOKEN"],
-        access_token_secret=config["TWITTER_ACCESS_TOKEN_SECRET"],
-    )
-    return client
-
-
-def setup_tweepy_api(config):
-    auth = tweepy.OAuthHandler(config["TWITTER_API_KEY"], config["TWITTER_API_SECRET"])
-    auth.set_access_token(
-        config["TWITTER_ACCESS_TOKEN"], config["TWITTER_ACCESS_TOKEN_SECRET"]
-    )
-    return tweepy.API(auth)
-
-
-def upload_media(url, API):
+def upload_media(url, bearer_token):
     response = requests.get(url)
     image_data = BytesIO(response.content).getvalue()
-    media = API.media_upload("quote_image.png", file=image_data)
-    return media.media_id
+    headers = CaseInsensitiveDict()
+    headers["Authorization"] = f"Bearer {bearer_token}"
+    headers["Content-Type"] = "multipart/form-data"
+    base64_image = base64.b64encode(image_data).decode("utf-8")
+    media_data = {"media_data": base64_image}
+    media_response = requests.post(
+        "https://upload.twitter.com/1.1/media/upload.json",
+        headers=headers,
+        data=media_data,
+    )
+    return media_response.json()["media_id_string"]
 
 
 def handle_error(e):
-    if isinstance(e, tweepy.errors.Unauthorized):
-        print(f"An error occurred while interacting with the Twitter API: {e}")
-        if e.api_codes and 89 in e.api_codes:
-            print("Please check your Twitter API keys and access tokens.")
+    if e.api_codes and 89 in e.api_codes:
+        print("Please check your Twitter API keys and access tokens.")
     elif isinstance(e, openai.error.APIError):
         print(f"OpenAI API returned an API Error: {e}")
     elif isinstance(e, openai.error.APIConnectionError):
@@ -49,8 +40,8 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def tweet_quote_and_image(client, API, config):
-    content_generator = ContentGenerator(client)
+def tweet_quote_and_image(bearer_token, config):
+    content_generator = ContentGenerator(bearer_token)
 
     try:
         threads = Threads(
@@ -74,12 +65,22 @@ def tweet_quote_and_image(client, API, config):
         image_url = content_generator.generate_image(detailed_description)
         print(f"Generated image URL: {image_url}")
 
-        media_id = upload_media(image_url, API)
+        media_id = upload_media(image_url, bearer_token)
         print(f"Uploaded media ID: {media_id}")
 
         quote_without_hashtags = re.sub(r"#\S+", "", quote)
 
-        client.create_tweet(text=quote, media_ids=[media_id])
+        headers = {"Authorization": f"Bearer {bearer_token}"}
+        data = {"status": quote, "media_ids": [media_id]}
+        response = requests.post(
+            "https://api.twitter.com/1.1/statuses/update.json",
+            headers=headers,
+            data=data,
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Request returned an error: {response.status_code}, {response.text}"
+            )
         print(f"Tweeted: {quote}")
 
     except Exception as e:
