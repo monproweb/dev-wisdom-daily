@@ -19,7 +19,7 @@ def upload_media(url, bearer_token):
     }
     data = {
         "command": "INIT",
-        "media_type": "image/jpg",
+        "media_type": "image/png",
         "total_bytes": len(image_data),
     }
     init_response = requests.post(
