@@ -6,7 +6,7 @@ This is a Threads/Twitter bot that generates and thread/tweets developer quotes 
 
 - [OpenAI API](https://openai.com/)
 - [threads-net](https://github.com/dmytrostriletskyi/threads-net)
-- [Tweepy](https://www.tweepy.org/)
+- [Twitter](https://developer.twitter.com/en/docs/twitter-api)
 - [Google Cloud Functions](https://cloud.google.com/functions)
 - [Google Cloud Scheduler](https://cloud.google.com/scheduler)
 - [Google Cloud Pub/Sub](https://cloud.google.com/pubsub)
@@ -30,7 +30,7 @@ To set up this project locally, you will need to:
    - `TWITTER_API_SECRET`
    - `TWITTER_ACCESS_TOKEN`
    - `TWITTER_ACCESS_TOKEN_SECRET`
-   - `OPENAI_API_KEY` (Follow the [official documentation](https://beta.openai.com/docs/developer-quickstart) to obtain an OpenAI API key)
+   - `OPENAI_API_KEY` (Follow the [official documentation](https://platform.openai.com/docs/quickstart) to obtain an OpenAI API key)
    - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
    - `INSTAGRAM_USERNAME` (Set this to the username of the Instagram account you want to use for posting the thread, e.g., "devwisdomdaily")
    - `INSTAGRAM_PASSWORD`
@@ -46,6 +46,10 @@ Once the project is set up, the bot will automatically tweet/thread a new develo
 ## 🤝 Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please open an issue. If you want to contribute code, please fork the repository and create a pull request.
+
+## 🌟 Contributors
+
+- [FastFingertips](https://github.com/FastFingertips)
 
 ## 📄 License
 
