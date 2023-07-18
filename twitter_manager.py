@@ -7,6 +7,7 @@ from threads import Threads
 import re
 import tempfile
 import os
+from requests_oauthlib import OAuth1Session
 
 
 def upload_media(url, bearer_token):
@@ -55,12 +56,19 @@ def upload_media(url, bearer_token):
     return media_id
 
 
-def tweet_quote_and_image(bearer_token, config):
-    content_generator = ContentGenerator(bearer_token)
+def tweet_quote_and_image(config):
+    oauth_v1 = OAuth1Session(
+        config["TWITTER_API_KEY"],
+        client_secret=config["TWITTER_API_SECRET"],
+        resource_owner_key=config["TWITTER_ACCESS_TOKEN"],
+        resource_owner_secret=config["TWITTER_ACCESS_TOKEN_SECRET"],
+    )
+
+    content_generator = ContentGenerator(config["TWITTER_BEARER_TOKEN"])
 
     try:
         threads = Threads(
-            username="devwisdomdaily", password=config["INSTAGRAM_PASSWORD"]
+            username=config["INSTAGRAM_USERNAME"], password=config["INSTAGRAM_PASSWORD"]
         )
     except Exception as e:
         print("An error occurred while setting up Threads: ", e)
@@ -80,25 +88,36 @@ def tweet_quote_and_image(bearer_token, config):
         image_url = content_generator.generate_image(detailed_description)
         print(f"Generated image URL: {image_url}")
 
-        media_id = upload_media(image_url, bearer_token)
+        # Upload image using API v1
+        media_id = upload_media(image_url, oauth_v1)
         print(f"Uploaded media ID: {media_id}")
 
         quote_without_hashtags = re.sub(r"#\S+", "", quote)
 
-        headers = {"Authorization": f"Bearer {bearer_token}"}
-        data = {"status": quote, "media_ids": [media_id]}
-        response = requests.post(
-            "https://api.twitter.com/1.1/statuses/update.json",
-            headers=headers,
-            data=data,
+        payload_v2 = {
+            "status": quote,
+            "media_ids": media_id,
+        }
+
+        oauth_v2 = OAuth1Session(
+            config["TWITTER_API_KEY"],
+            client_secret=config["TWITTER_API_SECRET"],
+            resource_owner_key=config["TWITTER_ACCESS_TOKEN"],
+            resource_owner_secret=config["TWITTER_ACCESS_TOKEN_SECRET"],
         )
-        if response.status_code != 200:
+
+        response = oauth_v2.post("https://api.twitter.com/2/tweets", json=payload_v2)
+
+        if response.status_code != 201:
             raise Exception(
                 f"Request returned an error: {response.status_code}, {response.text}"
             )
+
         print(f"Tweeted: {quote}")
 
     except Exception as e:
+        print("An error occurred while tweeting: ", e)
+
         if threads:
             try:
                 response = requests.get(image_url, stream=True)
