@@ -15,22 +15,21 @@ class ContentGenerator:
 
     def get_previous_quotes(self):
         """
-        Fetches the 50 latest tweets from the specified Twitter account and extracts the quotes from them.
+        Fetches the latest tweets from the specified Twitter account and extracts the quotes from them.
 
-        This method uses the Tweepy API to fetch the 50 most recent tweets from the "@DevWisdomDaily" account.
+        This method uses the Tweepy API to fetch the most recent tweets from the "@DevWisdomDaily" account.
         It then uses the `extract_quote_from_tweet` method to extract the quote from each tweet text.
 
         Returns:
             list[str]: A list of quotes extracted from the last 50 tweets.
         """
-        all_tweets = tweepy.Cursor(
-            self.api.user_timeline,
-            screen_name="@DevWisdomDaily",
-            count=50,
-            tweet_mode="extended",
-        ).items(50)
+        all_tweets = self.api.get_users_tweets(
+            id="DevWisdomDaily",
+            tweet_fields="text",
+            max_results=50,
+        )["data"]
 
-        return [self.extract_quote_from_tweet(tweet.full_text) for tweet in all_tweets]
+        return [self.extract_quote_from_tweet(tweet["text"]) for tweet in all_tweets]
 
     def extract_quote_from_tweet(self, tweet):
         """
@@ -43,7 +42,7 @@ class ContentGenerator:
             str: The extracted quote text.
         """
         match = re.search(r'"(.*?)"', tweet)
-        return match.group(0) if match else ""
+        return match.group(1) if match else ""
 
     def generate_quote(self, previous_quotes_text):
         """
