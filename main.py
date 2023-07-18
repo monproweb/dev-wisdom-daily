@@ -1,6 +1,6 @@
 import openai
 from config import get_config
-from twitter_manager import setup_tweepy_client, setup_tweepy_api, tweet_quote_and_image
+from twitter_manager import setup_tweepy_client, tweet_quote_and_image
 
 
 def trigger_tweet(event, context):
@@ -13,9 +13,8 @@ def trigger_tweet(event, context):
     """
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
-    API = setup_tweepy_api(config)
     client = setup_tweepy_client(config)
-    tweet_quote_and_image(client, API, config)
+    tweet_quote_and_image(client, config)
 
 
 def main():
@@ -25,9 +24,8 @@ def main():
     """
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
-    API = setup_tweepy_api(config)
     client = setup_tweepy_client(config)
-    tweet_quote_and_image(client, API, config)
+    tweet_quote_and_image(client, config)
 
 
 if __name__ == "__main__":

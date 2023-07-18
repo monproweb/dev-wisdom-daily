@@ -1,29 +1,28 @@
 import re
 import openai
-import tweepy
 
 
 class ContentGenerator:
-    def __init__(self, api):
+    def __init__(self, client):
         """
         Initialize the ContentGenerator with a Tweepy API object.
 
         Args:
             api (tweepy.API): The Tweepy API object.
         """
-        self.api = api
+        self.client = client
 
     def get_previous_quotes(self):
         """
         Fetches the latest tweets from the specified Twitter account and extracts the quotes from them.
 
-        This method uses the Tweepy API to fetch the most recent tweets from the "@DevWisdomDaily" account.
+        This method uses the Tweepy Client to fetch the most recent tweets from the "@DevWisdomDaily" account.
         It then uses the `extract_quote_from_tweet` method to extract the quote from each tweet text.
 
         Returns:
             list[str]: A list of quotes extracted from the last 50 tweets.
         """
-        all_tweets = self.api.get_users_tweets(
+        all_tweets = self.client.get_timeline(
             id="DevWisdomDaily",
             tweet_fields="text",
             max_results=50,

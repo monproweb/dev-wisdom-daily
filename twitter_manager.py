@@ -2,13 +2,11 @@ import openai
 import tweepy
 import requests
 from io import BytesIO
-from PIL import Image
 from content_generator import ContentGenerator
 from threads import Threads
 import re
 import tempfile
 import os
-import json
 
 
 def setup_tweepy_client(config):
@@ -21,20 +19,21 @@ def setup_tweepy_client(config):
     return client
 
 
-def setup_tweepy_api(config):
-    auth = tweepy.OAuthHandler(config["TWITTER_API_KEY"], config["TWITTER_API_SECRET"])
-    auth.set_access_token(
-        config["TWITTER_ACCESS_TOKEN"], config["TWITTER_ACCESS_TOKEN_SECRET"]
-    )
-    return tweepy.API(auth)
-
-
-def upload_media(url, API):
+def upload_media(url, client):
     response = requests.get(url)
     image_data = BytesIO(response.content)
 
-    media = API.media_upload("quote_image.png", file=image_data)
-    return media.media_id_string
+    init_response = client.media_upload_init(
+        "quote_image.png", file_type="image/png", total_bytes=len(image_data)
+    )
+    media_id = init_response["media_key"]
+
+    for i, chunk in enumerate(image_data):
+        client.media_upload_append(media_id=media_id, segment_index=i, media_data=chunk)
+
+    client.media_upload_finalize(media_id)
+
+    return media_id
 
 
 def handle_error(e):
@@ -52,7 +51,7 @@ def handle_error(e):
         print(f"An unexpected error occurred: {e}")
 
 
-def tweet_quote_and_image(client, API, config):
+def tweet_quote_and_image(client, config):
     content_generator = ContentGenerator(client)
 
     try:
@@ -77,7 +76,7 @@ def tweet_quote_and_image(client, API, config):
         image_url = content_generator.generate_image(detailed_description)
         print(f"Generated image URL: {image_url}")
 
-        media_id = upload_media(image_url, API)
+        media_id = upload_media(image_url, client)
         print(f"Uploaded media ID: {media_id}")
 
         quote_without_hashtags = re.sub(r"#\S+", "", quote)
