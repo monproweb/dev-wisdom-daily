@@ -56,7 +56,7 @@ def upload_media(url, bearer_token):
     return media_id
 
 
-def tweet_quote_and_image(config):
+def tweet_quote_and_image(config, bearer_token):
     oauth_v1 = OAuth1Session(
         config["TWITTER_API_KEY"],
         client_secret=config["TWITTER_API_SECRET"],

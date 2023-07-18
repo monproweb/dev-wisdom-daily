@@ -14,7 +14,7 @@ def trigger_tweet(event, context):
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     bearer_token = config["TWITTER_BEARER_TOKEN"]
-    tweet_quote_and_image(bearer_token, config)
+    tweet_quote_and_image(config, bearer_token)
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     bearer_token = config["TWITTER_BEARER_TOKEN"]
-    tweet_quote_and_image(bearer_token, config)
+    tweet_quote_and_image(config, bearer_token)
 
 
 if __name__ == "__main__":
