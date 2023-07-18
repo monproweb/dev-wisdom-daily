@@ -55,36 +55,6 @@ def upload_media(url, bearer_token):
     return media_id
 
 
-def handle_error(e):
-    """
-    Handle exceptions raised by the Twitter API.
-
-    Args:
-        e (Exception): The exception to handle.
-
-    Raises:
-        e: The original exception if it cannot be handled.
-    """
-    try:
-        if e.api_codes and 89 in e.api_codes:
-            print(
-                "Invalid or expired token; please verify the validity of your "
-                "Twitter API keys and access tokens."
-            )
-        elif e.status_code == 403:
-            print(
-                "Tweet not sent due to duplicate content or another violation "
-                "of the Twitter rules."
-            )
-        else:
-            raise e
-    except AttributeError:
-        if isinstance(e, json.JSONDecodeError):
-            print("Failed to decode JSON response.")
-        else:
-            raise e
-
-
 def tweet_quote_and_image(bearer_token, config):
     content_generator = ContentGenerator(bearer_token)
 
