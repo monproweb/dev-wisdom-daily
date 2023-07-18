@@ -14,28 +14,6 @@ class ContentGenerator:
         """
         self.bearer_token = bearer_token
 
-    def get_user_id(self, username):
-        """
-        Fetches the user ID from the specified Twitter account.
-
-        Args:
-            username (str): The username of the Twitter account.
-
-        Returns:
-            str: The user ID of the Twitter account.
-        """
-        headers = {"Authorization": f"Bearer {self.bearer_token}"}
-        url = f"https://api.twitter.com/2/users/by/username/{username}"
-        response = requests.get(url, headers=headers)
-        data = json.loads(response.text)
-
-        if response.status_code != 200:
-            raise Exception(
-                f"Request returned an error: {response.status_code}, {response.text}"
-            )
-
-        return data["data"]["id"]
-
     def get_previous_quotes(self):
         """
         Fetches the latest tweets from the specified Twitter account and extracts the quotes from them.
@@ -47,7 +25,7 @@ class ContentGenerator:
             list[str]: A list of quotes extracted from the last 50 tweets.
         """
         headers = {"Authorization": f"Bearer {self.bearer_token}"}
-        user_id = self.get_user_id("DevWisdomDaily")
+        user_id = "1643273350087680001"
         url = f"https://api.twitter.com/2/users/{user_id}/tweets?tweet.fields=created_at,text&max_results=50"
         response = requests.get(url, headers=headers)
         data = json.loads(response.text)
