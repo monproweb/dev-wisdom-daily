@@ -99,28 +99,28 @@ def tweet_quote_and_image(bearer_token, config):
         print(f"Tweeted: {quote}")
 
     except Exception as e:
-        handle_error(e)
+        if threads:
+            try:
+                response = requests.get(image_url, stream=True)
+                with tempfile.NamedTemporaryFile(
+                    suffix=".png", delete=False
+                ) as temp_file:
+                    for chunk in response.iter_content(1024):
+                        temp_file.write(chunk)
+                    temp_filename = temp_file.name
 
-    if threads:
-        try:
-            response = requests.get(image_url, stream=True)
-            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
-                for chunk in response.iter_content(1024):
-                    temp_file.write(chunk)
-                temp_filename = temp_file.name
+                print(f"Temp file name: {temp_filename}")
 
-            print(f"Temp file name: {temp_filename}")
+                with open(temp_filename, "rb") as image_file:
+                    created_thread = threads.private_api.create_thread(
+                        caption=quote_without_hashtags,
+                        image_file=image_file,
+                    )
+                print(f"Posted to Threads: {created_thread}")
 
-            with open(temp_filename, "rb") as image_file:
-                created_thread = threads.private_api.create_thread(
-                    caption=quote_without_hashtags,
-                    image_file=image_file,
-                )
-            print(f"Posted to Threads: {created_thread}")
+                os.remove(temp_filename)
 
-            os.remove(temp_filename)
-
-        except Exception as e:
-            print("An error occurred while interacting with Threads: ", e)
-    else:
-        print("Threads was not set up correctly.")
+            except Exception as e:
+                print("An error occurred while interacting with Threads: ", e)
+        else:
+            print("Threads was not set up correctly.")
