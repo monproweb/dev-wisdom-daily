@@ -18,15 +18,16 @@ class ContentGenerator:
         """
         Fetches the latest tweets from the specified Twitter account and extracts the quotes from them.
 
-        This method uses the Twitter API to fetch the most recent tweets from the "@DevWisdomDaily" account.
+        This method uses the Twitter API v1.1 to fetch the most recent tweets from the "@DevWisdomDaily" account.
         It then uses the `extract_quote_from_tweet` method to extract the quote from each tweet text.
 
         Returns:
             list[str]: A list of quotes extracted from the last 50 tweets.
         """
         headers = {"Authorization": f"Bearer {self.bearer_token}"}
-        user_id = "1643273350087680001"
-        url = f"https://api.twitter.com/2/users/{user_id}/tweets?tweet.fields=created_at,text&max_results=50"
+        screen_name = "DevWisdomDaily"
+        url = f"https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name={screen_name}&count=50&tweet_mode=extended"
+
         response = requests.get(url, headers=headers)
         data = json.loads(response.text)
 
@@ -35,7 +36,7 @@ class ContentGenerator:
                 f"Request returned an error: {response.status_code}, {response.text}"
             )
 
-        return [self.extract_quote_from_tweet(tweet["text"]) for tweet in data["data"]]
+        return [self.extract_quote_from_tweet(tweet["full_text"]) for tweet in data]
 
     def extract_quote_from_tweet(self, tweet):
         """
