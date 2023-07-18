@@ -22,8 +22,11 @@ class ContentGenerator:
         Returns:
             list[str]: A list of quotes extracted from the last 50 tweets.
         """
+        user = self.client.get_user(username="DevWisdomDaily")
+        user_id = user.data["id"]
+
         all_tweets = self.client.get_timeline(
-            id="DevWisdomDaily",
+            id=user_id,
             tweet_fields="text",
             max_results=50,
         )["data"]
