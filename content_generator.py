@@ -25,13 +25,13 @@ class ContentGenerator:
         user = self.client.get_user(username="DevWisdomDaily")
         user_id = user.data["id"]
 
-        all_tweets = self.client.get_timeline(
+        all_tweets = self.client.get_users_tweets(
             id=user_id,
             tweet_fields="text",
             max_results=50,
-        )["data"]
+        )
 
-        return [self.extract_quote_from_tweet(tweet["text"]) for tweet in all_tweets]
+        return [self.extract_quote_from_tweet(tweet["tweet"]) for tweet in all_tweets]
 
     def extract_quote_from_tweet(self, tweet):
         """
