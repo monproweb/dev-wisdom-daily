@@ -7,24 +7,52 @@ from threads import Threads
 import re
 import tempfile
 import os
-import base64
-from requests.structures import CaseInsensitiveDict
 
 
 def upload_media(url, bearer_token):
     response = requests.get(url)
     image_data = BytesIO(response.content).getvalue()
-    headers = CaseInsensitiveDict()
-    headers["Authorization"] = f"Bearer {bearer_token}"
+
+    headers = {
+        "Authorization": f"Bearer {bearer_token}",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+    data = {
+        "command": "INIT",
+        "media_type": "image/jpg",
+        "total_bytes": len(image_data),
+    }
+    init_response = requests.post(
+        "https://upload.twitter.com/1.1/media/upload.json", headers=headers, data=data
+    )
+    media_id = init_response.json().get("media_id_string")
+
     headers["Content-Type"] = "multipart/form-data"
-    base64_image = base64.b64encode(image_data).decode("utf-8")
-    media_data = {"media_data": base64_image}
-    media_response = requests.post(
+    data = {"command": "APPEND", "media_id": media_id, "segment_index": 0}
+    files = {"media": image_data}
+    append_response = requests.post(
         "https://upload.twitter.com/1.1/media/upload.json",
         headers=headers,
-        data=media_data,
+        data=data,
+        files=files,
     )
-    return media_response.json()["media_id_string"]
+
+    if append_response.status_code != 204:
+        raise Exception(
+            f"Media upload failed at APPEND stage with status code {append_response.status_code}, response {append_response.text}"
+        )
+
+    data = {"command": "FINALIZE", "media_id": media_id}
+    finalize_response = requests.post(
+        "https://upload.twitter.com/1.1/media/upload.json", headers=headers, data=data
+    )
+
+    if finalize_response.status_code != 200:
+        raise Exception(
+            f"Media upload failed at FINALIZE stage with status code {finalize_response.status_code}, response {finalize_response.text}"
+        )
+
+    return media_id
 
 
 def handle_error(e):
