@@ -64,7 +64,9 @@ def tweet_quote_and_image(client, API, config):
         threads = None
 
     try:
-        quote, quote_text = content_generator.generate_quote()
+        previous_quotes = content_generator.get_previous_quotes()
+
+        quote, quote_text = content_generator.generate_quote(previous_quotes)
         print(f"Generated quote: {quote}")
 
         detailed_description = content_generator.generate_detailed_description(
