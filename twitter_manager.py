@@ -17,9 +17,9 @@ class TwitterManager:
 
     def get_previous_quotes(self):
         headers = {"Authorization": f"Bearer {self.config['TWITTER_BEARER_TOKEN']}"}
-        user_id = 1643273350087680001
-        url = f"https://api.twitter.com/1.1/statuses/user_timeline.json?user_id={user_id}&count=50"
-        response = requests.get(url, headers=headers)
+        screen_name = "DevWisdomDaily"
+        url = f"https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name={screen_name}&count=50"
+        response = self.oauth_v1.get(url, headers=headers)
         data = json.loads(response.text)
 
         if response.status_code != 200:
@@ -46,7 +46,7 @@ class TwitterManager:
             "media_type": "image/png",
             "total_bytes": len(image_data),
         }
-        init_response = requests.post(
+        init_response = self.oauth_v1.post(
             "https://upload.twitter.com/1.1/media/upload.json",
             headers=headers,
             data=data,
@@ -56,7 +56,7 @@ class TwitterManager:
         headers["Content-Type"] = "multipart/form-data"
         data = {"command": "APPEND", "media_id": media_id, "segment_index": 0}
         files = {"media": image_data}
-        append_response = requests.post(
+        append_response = self.oauth_v1.post(
             "https://upload.twitter.com/1.1/media/upload.json",
             headers=headers,
             data=data,
@@ -69,7 +69,7 @@ class TwitterManager:
             )
 
         data = {"command": "FINALIZE", "media_id": media_id}
-        finalize_response = requests.post(
+        finalize_response = self.oauth_v1.post(
             "https://upload.twitter.com/1.1/media/upload.json",
             headers=headers,
             data=data,
