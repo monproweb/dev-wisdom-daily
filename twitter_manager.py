@@ -18,8 +18,8 @@ class TwitterManager:
         match = re.search(r'"(.*?)"', tweet)
         return match.group(1) if match else ""
 
-    def upload_media(self, url):
-        response = requests.get(url)
+    def upload_media(self, image_url):
+        response = requests.get(image_url)
         image_data = BytesIO(response.content).getvalue()
 
         headers = {
@@ -27,45 +27,21 @@ class TwitterManager:
             "Content-Type": "application/x-www-form-urlencoded",
         }
         data = {
-            "command": "INIT",
-            "media_type": "image/png",
-            "total_bytes": len(image_data),
+            "media_data": image_data,
         }
-        init_response = self.oauth_v1.post(
+
+        upload_response = self.oauth_v1.post(
             "https://upload.twitter.com/1.1/media/upload.json",
             headers=headers,
             data=data,
         )
-        media_id = init_response.json().get("media_id_string")
 
-        headers["Content-Type"] = "multipart/form-data"
-        data = {"command": "APPEND", "media_id": media_id, "segment_index": 0}
-        files = {"media": image_data}
-        append_response = self.oauth_v1.post(
-            "https://upload.twitter.com/1.1/media/upload.json",
-            headers=headers,
-            data=data,
-            files=files,
-        )
-
-        if append_response.status_code != 204:
+        if upload_response.status_code != 200:
             raise Exception(
-                f"Media upload failed at APPEND stage with status code {append_response.status_code}, response {append_response.text}"
+                f"Media upload failed with status code {upload_response.status_code}, response {upload_response.text}"
             )
 
-        data = {"command": "FINALIZE", "media_id": media_id}
-        finalize_response = self.oauth_v1.post(
-            "https://upload.twitter.com/1.1/media/upload.json",
-            headers=headers,
-            data=data,
-        )
-
-        if finalize_response.status_code != 200:
-            raise Exception(
-                f"Media upload failed at FINALIZE stage with status code {finalize_response.status_code}, response {finalize_response.text}"
-            )
-
-        return media_id
+        return upload_response.json().get("media_id_string")
 
     def tweet_quote_and_image(self, quote, image_url):
         media_id = self.upload_media(image_url)
