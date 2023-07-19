@@ -1,4 +1,3 @@
-import openai
 from config import get_config
 from twitter_manager import TwitterManager
 from threads_manager import ThreadsManager
@@ -14,14 +13,13 @@ def trigger_tweet(event, context):
         context (google.cloud.functions.Context): Metadata about the function invocation (not used in this function).
     """
     config = get_config()
-    openai.api_key = config["OPENAI_API_KEY"]
-    bearer_token = config["TWITTER_BEARER_TOKEN"]
-    twitter_manager = TwitterManager(config, bearer_token)
+    twitter_manager = TwitterManager(config)
     threads_manager = ThreadsManager(config)
-    content_generator = ContentGenerator()
-    quote_without_hashtags, image_url = twitter_manager.tweet_quote_and_image(
-        content_generator
-    )
+    content_generator = ContentGenerator(config)
+
+    quote, image_url = content_generator.generate_quote_and_image()
+
+    quote_without_hashtags = twitter_manager.tweet_quote_and_image(quote, image_url)
     threads_manager.thread_quote_and_image(quote_without_hashtags, image_url)
 
 
@@ -31,14 +29,13 @@ def main():
     generates a unique quote and its corresponding image description, and tweets them as an image.
     """
     config = get_config()
-    openai.api_key = config["OPENAI_API_KEY"]
-    bearer_token = config["TWITTER_BEARER_TOKEN"]
-    twitter_manager = TwitterManager(config, bearer_token)
+    twitter_manager = TwitterManager(config)
     threads_manager = ThreadsManager(config)
-    content_generator = ContentGenerator()
-    quote_without_hashtags, image_url = twitter_manager.tweet_quote_and_image(
-        content_generator
-    )
+    content_generator = ContentGenerator(config)
+
+    quote, image_url = content_generator.generate_quote_and_image()
+
+    quote_without_hashtags = twitter_manager.tweet_quote_and_image(quote, image_url)
     threads_manager.thread_quote_and_image(quote_without_hashtags, image_url)
 
 

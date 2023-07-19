@@ -3,6 +3,9 @@ import openai
 
 
 class ContentGenerator:
+    def __init__(self, config):
+        self.config = config
+
     def generate_quote(self, previous_quotes_text):
         chat_messages = [
             {

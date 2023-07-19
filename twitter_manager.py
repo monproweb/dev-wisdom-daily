@@ -1,7 +1,6 @@
 import requests
 import json
 from io import BytesIO
-from content_generator import ContentGenerator
 import re
 from requests_oauthlib import OAuth1Session
 
