@@ -51,6 +51,10 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 - [FastFingertips](https://github.com/FastFingertips)
 
+## 📝 TODO
+
+Try to fix Threads and add MongoDB for get_previous_quotes.
+
 ## 📄 License
 
 This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
