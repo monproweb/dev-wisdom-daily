@@ -49,13 +49,20 @@ def get_config():
     """
     load_dotenv()
 
+    twitter_api_key = os.getenv("TWITTER_API_KEY")
+    twitter_api_secret = os.getenv("TWITTER_API_SECRET")
+    twitter_bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+
+    if not twitter_bearer_token:
+        twitter_bearer_token = get_bearer_token(twitter_api_key, twitter_api_secret)
+
     config = {
         "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
-        "TWITTER_API_KEY": os.getenv("TWITTER_API_KEY"),
-        "TWITTER_API_SECRET": os.getenv("TWITTER_API_SECRET"),
+        "TWITTER_API_KEY": twitter_api_key,
+        "TWITTER_API_SECRET": twitter_api_secret,
         "TWITTER_ACCESS_TOKEN": os.getenv("TWITTER_ACCESS_TOKEN"),
         "TWITTER_ACCESS_TOKEN_SECRET": os.getenv("TWITTER_ACCESS_TOKEN_SECRET"),
-        "TWITTER_BEARER_TOKEN": os.getenv("TWITTER_BEARER_TOKEN"),
+        "TWITTER_BEARER_TOKEN": twitter_bearer_token,
         "INSTAGRAM_USERNAME": os.getenv("INSTAGRAM_USERNAME"),
         "INSTAGRAM_PASSWORD": os.getenv("INSTAGRAM_PASSWORD"),
     }
