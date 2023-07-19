@@ -1,6 +1,6 @@
 import requests
-from io import BytesIO
 import re
+import base64
 from requests_oauthlib import OAuth1Session
 
 
@@ -14,17 +14,12 @@ class TwitterManager:
             resource_owner_secret=config["TWITTER_ACCESS_TOKEN_SECRET"],
         )
 
-    def extract_quote_from_tweet(self, tweet):
-        match = re.search(r'"(.*?)"', tweet)
-        return match.group(1) if match else ""
-
     def upload_media(self, image_url):
         response = requests.get(image_url)
-        image_data = BytesIO(response.content).getvalue()
+        image_data = base64.b64encode(response.content).decode("utf-8")
 
         headers = {
             "Authorization": f"Bearer {self.config['TWITTER_BEARER_TOKEN']}",
-            "Content-Type": "application/x-www-form-urlencoded",
         }
         data = {
             "media_data": image_data,
