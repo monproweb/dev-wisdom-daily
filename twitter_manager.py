@@ -16,19 +16,19 @@ class TwitterManager:
 
     def upload_media(self, image_url):
         response = requests.get(image_url)
-        image_data = base64.b64encode(response.content).decode("utf-8")
+        image_data = response.content
 
         headers = {
             "Authorization": f"Bearer {self.config['TWITTER_BEARER_TOKEN']}",
         }
-        data = {
-            "media_data": image_data,
+        files = {
+            "media": image_data,
         }
 
         upload_response = self.oauth_v1.post(
             "https://upload.twitter.com/1.1/media/upload.json",
             headers=headers,
-            data=data,
+            files=files,
         )
 
         if upload_response.status_code != 200:
