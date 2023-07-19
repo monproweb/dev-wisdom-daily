@@ -18,7 +18,7 @@ def trigger_tweet(event, context):
     bearer_token = config["TWITTER_BEARER_TOKEN"]
     twitter_manager = TwitterManager(config, bearer_token)
     threads_manager = ThreadsManager(config)
-    content_generator = ContentGenerator(bearer_token)
+    content_generator = ContentGenerator()
     quote_without_hashtags, image_url = twitter_manager.tweet_quote_and_image(
         content_generator
     )
@@ -35,7 +35,7 @@ def main():
     bearer_token = config["TWITTER_BEARER_TOKEN"]
     twitter_manager = TwitterManager(config, bearer_token)
     threads_manager = ThreadsManager(config)
-    content_generator = ContentGenerator(bearer_token)
+    content_generator = ContentGenerator()
     quote_without_hashtags, image_url = twitter_manager.tweet_quote_and_image(
         content_generator
     )
