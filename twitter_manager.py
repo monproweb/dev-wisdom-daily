@@ -44,10 +44,7 @@ class TwitterManager:
 
         quote_without_hashtags = re.sub(r"#\S+", "", quote)
 
-        payload_v2 = {
-            "text": quote,
-            "media_ids": media_id,
-        }
+        payload_v2 = {"status": quote, "attachments": {"media_keys": [media_id]}}
 
         response = self.oauth_v1.post(
             "https://api.twitter.com/2/tweets", json=payload_v2
