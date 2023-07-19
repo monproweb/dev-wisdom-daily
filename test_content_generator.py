@@ -1,44 +1,55 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from content_generator import ContentGenerator
 
 
 class TestContentGenerator(unittest.TestCase):
     def setUp(self):
-        self.api = MagicMock()
-        self.content_generator = ContentGenerator(self.api)
+        self.cg = ContentGenerator()
 
     @patch("openai.ChatCompletion.create")
-    def test_generate_quote(self, mock_chat_create):
-        # Define a list of mock responses
-        mock_responses = [
-            MagicMock(
-                choices=[
-                    MagicMock(
-                        message={
-                            "content": '"Test quote" - Test Author 💻🚀 #Test1 #Test2'
-                        }
-                    )
-                ]
-            ),
-            MagicMock(choices=[MagicMock(message={"content": "No quote here"})]),
-            MagicMock(choices=[]),
-        ]
+    def test_generate_quote(self, mock_create):
+        mock_create.return_value = MockResponse(
+            choices=[
+                MockMessage(
+                    {"content": '"This is a test quote." - Test Person #Test 🎉'}
+                )
+            ]
+        )
+        quote, quote_text = self.cg.generate_quote("Test previous quote")
+        self.assertEqual(quote, '"This is a test quote." - Test Person #Test 🎉')
+        self.assertEqual(quote_text, "This is a test quote.")
 
-        # Define a list of expected results
-        expected_results = [
-            ('"Test quote" - Test Author 💻🚀 #Test1 #Test2', '"Test quote"'),
-            ("No quote here", ""),
-            ("", ""),
-        ]
+    @patch("openai.ChatCompletion.create")
+    def test_generate_detailed_description(self, mock_create):
+        mock_create.return_value = MockResponse(
+            choices=[MockMessage({"content": "This is a detailed description."})]
+        )
+        detailed_description = self.cg.generate_detailed_description("Test quote")
+        self.assertEqual(detailed_description, "This is a detailed description.")
 
-        # Test generate_quote with each mock response and check the result
-        for mock_response, expected_result in zip(mock_responses, expected_results):
-            mock_chat_create.return_value = mock_response
-            result = self.content_generator.generate_quote()
-            self.assertEqual(result, expected_result)
+    @patch("openai.Image.create")
+    def test_generate_image(self, mock_create):
+        mock_create.return_value = MockImageResponse(
+            data=[{"url": "https://monproweb.eth.limo/test.png"}]
+        )
+        image_url = self.cg.generate_image("Test prompt")
+        self.assertEqual(image_url, "http://monproweb.eth.limo/test.png")
 
-    # Add more tests...
+
+class MockResponse:
+    def __init__(self, choices):
+        self.choices = choices
+
+
+class MockMessage:
+    def __init__(self, message):
+        self.message = message
+
+
+class MockImageResponse:
+    def __init__(self, data):
+        self.data = data
 
 
 if __name__ == "__main__":

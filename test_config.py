@@ -15,6 +15,8 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config["TWITTER_ACCESS_TOKEN"], "test_value")
         self.assertEqual(config["TWITTER_ACCESS_TOKEN_SECRET"], "test_value")
         self.assertEqual(config["OPENAI_API_KEY"], "test_value")
+        self.assertEqual(config["INSTAGRAM_USERNAME"], "test_value")
+        self.assertEqual(config["INSTAGRAM_PASSWORD"], "test_value")
 
 
 if __name__ == "__main__":
