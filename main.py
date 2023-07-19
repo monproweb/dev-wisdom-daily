@@ -1,7 +1,8 @@
 import openai
 from config import get_config
-from twitter_manager import tweet_quote_and_image
-from threads_manager import thread_quote_and_image
+from twitter_manager import TwitterManager
+from threads_manager import ThreadsManager
+from content_generator import ContentGenerator
 
 
 def trigger_tweet(event, context):
@@ -15,8 +16,13 @@ def trigger_tweet(event, context):
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     bearer_token = config["TWITTER_BEARER_TOKEN"]
-    quote_without_hashtags, image_url = tweet_quote_and_image(config, bearer_token)
-    thread_quote_and_image(quote_without_hashtags, image_url, config)
+    twitter_manager = TwitterManager(config, bearer_token)
+    threads_manager = ThreadsManager(config)
+    content_generator = ContentGenerator(bearer_token)
+    quote_without_hashtags, image_url = twitter_manager.tweet_quote_and_image(
+        content_generator
+    )
+    threads_manager.thread_quote_and_image(quote_without_hashtags, image_url)
 
 
 def main():
@@ -27,8 +33,13 @@ def main():
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     bearer_token = config["TWITTER_BEARER_TOKEN"]
-    quote_without_hashtags, image_url = tweet_quote_and_image(config, bearer_token)
-    thread_quote_and_image(quote_without_hashtags, image_url, config)
+    twitter_manager = TwitterManager(config, bearer_token)
+    threads_manager = ThreadsManager(config)
+    content_generator = ContentGenerator(bearer_token)
+    quote_without_hashtags, image_url = twitter_manager.tweet_quote_and_image(
+        content_generator
+    )
+    threads_manager.thread_quote_and_image(quote_without_hashtags, image_url)
 
 
 if __name__ == "__main__":
