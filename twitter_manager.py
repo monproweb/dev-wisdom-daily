@@ -17,8 +17,8 @@ class TwitterManager:
 
     def get_previous_quotes(self):
         headers = {"Authorization": f"Bearer {self.config['TWITTER_BEARER_TOKEN']}"}
-        screen_name = "DevWisdomDaily"
-        url = f"https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name={screen_name}&count=50&tweet_mode=extended"
+        user_id = 1643273350087680001
+        url = f"https://api.twitter.com/1.1/statuses/user_timeline.json?user_id={user_id}&count=50"
         response = requests.get(url, headers=headers)
         data = json.loads(response.text)
 
