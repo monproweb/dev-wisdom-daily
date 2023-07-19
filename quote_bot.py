@@ -11,10 +11,7 @@ class QuoteBot:
         self.content_generator = ContentGenerator(config)
 
     def generate_and_post(self):
-        previous_quotes = self.twitter_manager.get_previous_quotes()
-        previous_quotes_text = "\n".join(previous_quotes)
-
-        quote, quote_text = self.content_generator.generate_quote(previous_quotes_text)
+        quote, quote_text = self.content_generator.generate_quote()
         detailed_description = self.content_generator.generate_detailed_description(
             quote_text
         )

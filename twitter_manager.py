@@ -1,5 +1,4 @@
 import requests
-import json
 from io import BytesIO
 import re
 from requests_oauthlib import OAuth1Session
@@ -14,20 +13,6 @@ class TwitterManager:
             resource_owner_key=config["TWITTER_ACCESS_TOKEN"],
             resource_owner_secret=config["TWITTER_ACCESS_TOKEN_SECRET"],
         )
-
-    def get_previous_quotes(self):
-        headers = {"Authorization": f"Bearer {self.config['TWITTER_BEARER_TOKEN']}"}
-        screen_name = "DevWisdomDaily"
-        url = f"https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name={screen_name}&count=50"
-        response = self.oauth_v1.get(url, headers=headers)
-        data = json.loads(response.text)
-
-        if response.status_code != 200:
-            raise Exception(
-                f"Request returned an error: {response.status_code}, {response.text}"
-            )
-
-        return [self.extract_quote_from_tweet(tweet["full_text"]) for tweet in data]
 
     def extract_quote_from_tweet(self, tweet):
         match = re.search(r'"(.*?)"', tweet)
@@ -89,7 +74,7 @@ class TwitterManager:
         quote_without_hashtags = re.sub(r"#\S+", "", quote)
 
         payload_v2 = {
-            "status": quote,
+            "text": quote,
             "media_ids": media_id,
         }
 
