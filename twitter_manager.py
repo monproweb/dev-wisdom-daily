@@ -44,11 +44,9 @@ class TwitterManager:
 
         quote_without_hashtags = re.sub(r"#\S+", "", quote)
 
-        payload_v2 = {"status": quote, "attachments": {"media_keys": [media_id]}}
+        payload = {"text": quote, "media": {"media_ids": [media_id]}}
 
-        response = self.oauth_v1.post(
-            "https://api.twitter.com/2/tweets", json=payload_v2
-        )
+        response = self.oauth_v1.post("https://api.twitter.com/2/tweets", json=payload)
 
         if response.status_code != 201:
             raise Exception(
