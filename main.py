@@ -1,6 +1,7 @@
 import openai
 from config import get_config
 from twitter_manager import tweet_quote_and_image
+from threads_manager import thread_quote_and_image
 
 
 def trigger_tweet(event, context):
@@ -14,7 +15,8 @@ def trigger_tweet(event, context):
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     bearer_token = config["TWITTER_BEARER_TOKEN"]
-    tweet_quote_and_image(config, bearer_token)
+    quote_without_hashtags, image_url = tweet_quote_and_image(config, bearer_token)
+    thread_quote_and_image(quote_without_hashtags, image_url, config)
 
 
 def main():
@@ -25,7 +27,8 @@ def main():
     config = get_config()
     openai.api_key = config["OPENAI_API_KEY"]
     bearer_token = config["TWITTER_BEARER_TOKEN"]
-    tweet_quote_and_image(config, bearer_token)
+    quote_without_hashtags, image_url = tweet_quote_and_image(config, bearer_token)
+    thread_quote_and_image(quote_without_hashtags, image_url, config)
 
 
 if __name__ == "__main__":
