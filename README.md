@@ -10,6 +10,7 @@ This is a Threads/Twitter bot that generates and thread/tweets developer quotes 
 - [Google Cloud Functions](https://cloud.google.com/functions)
 - [Google Cloud Scheduler](https://cloud.google.com/scheduler)
 - [Google Cloud Pub/Sub](https://cloud.google.com/pubsub)
+- [MongoDB](https://www.mongodb.com/products/platform/cloud)
 - [Python](https://www.python.org/)
 
 ## 📋 Prerequisites
@@ -18,6 +19,7 @@ This is a Threads/Twitter bot that generates and thread/tweets developer quotes 
 - A Instagram account without 2FA
 - A Twitter Developer account with API keys and access tokens
 - An OpenAI API key
+- A MongoDB database
 
 ## 🛠️ Setup
 
@@ -34,7 +36,18 @@ To set up this project locally, you will need to:
    - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
    - `INSTAGRAM_USERNAME` (Set this to the username of the Instagram account you want to use for posting the thread, e.g., "devwisdomdaily")
    - `INSTAGRAM_PASSWORD`
-4. Deploy the function to Google Cloud Functions
+   - `MONGODB_USERNAME`
+   - `MONGODB_PASSWORD`
+4. Deploy the function to Google Cloud Functions using the following command:
+
+    ```shell
+    gcloud functions deploy trigger_tweet \
+    --runtime python311 \
+    --trigger-resource devwisdomdaily_tweet \
+    --trigger-event google.pubsub.topic.publish \
+    --entry-point trigger_tweet \
+    --env-vars-file .env
+    ```
 5. Create a topic in Google Cloud Pub/Sub
 6. Create a subscription for the topic
 7. Create a Cloud Scheduler job to trigger the function with a Pub/Sub target
