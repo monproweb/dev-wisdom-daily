@@ -17,6 +17,8 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config["OPENAI_API_KEY"], "test_value")
         self.assertEqual(config["INSTAGRAM_USERNAME"], "test_value")
         self.assertEqual(config["INSTAGRAM_PASSWORD"], "test_value")
+        self.assertEqual(config["MONGODB_USERNAME"], "test_value")
+        self.assertEqual(config["MONGODB_PASSWORD"], "test_value")
 
 
 if __name__ == "__main__":
