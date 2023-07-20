@@ -32,6 +32,7 @@ To set up this project locally, you will need to:
    - `TWITTER_API_SECRET`
    - `TWITTER_ACCESS_TOKEN`
    - `TWITTER_ACCESS_TOKEN_SECRET`
+   - `BEARER_TOKEN`
    - `OPENAI_API_KEY` (Follow the [official documentation](https://platform.openai.com/docs/quickstart) to obtain an OpenAI API key)
    - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
    - `INSTAGRAM_USERNAME` (Set this to the username of the Instagram account you want to use for posting the thread, e.g., "devwisdomdaily")
