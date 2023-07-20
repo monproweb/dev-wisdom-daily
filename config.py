@@ -20,6 +20,8 @@ def get_config():
         "TWITTER_BEARER_TOKEN": os.getenv("TWITTER_BEARER_TOKEN"),
         "INSTAGRAM_USERNAME": os.getenv("INSTAGRAM_USERNAME"),
         "INSTAGRAM_PASSWORD": os.getenv("INSTAGRAM_PASSWORD"),
+        "MONGODB_USERNAME": os.getenv("MONGODB_USERNAME"),
+        "MONGODB_PASSWORD": os.getenv("MONGODB_PASSWORD"),
     }
 
     return config

@@ -53,7 +53,7 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ## 📝 TODO
 
-Try to fix Threads and add MongoDB for get_previous_quotes.
+Try to fix Threads.
 
 ## 📄 License
 

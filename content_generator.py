@@ -1,5 +1,6 @@
 import re
 import openai
+from mongo_manager import insert_quote, get_last_50_quotes
 
 
 class ContentGenerator:
@@ -7,7 +8,13 @@ class ContentGenerator:
         self.config = config
 
     def generate_quote(self):
+        previous_quotes = get_last_50_quotes()
         chat_messages = [
+            {
+                "role": "assistant",
+                "content": "Here are the last 50 quotes that have been generated: "
+                + "\n".join(previous_quotes),
+            },
             {
                 "role": "user",
                 "content": "Share a thought-provoking and concise quote that captures the spirit of a specific domain within the tech industry, such as artificial intelligence, web3 development, software development, game development, cybersecurity, or data science. The quote should come from a respected figure in the specified domain and resonate within the tech community. Use 1-2 relevant hashtags and emojis to enhance engagement. Present the quote first, followed by the individual's name and emojis, and end with the appropriate hashtags.",
@@ -26,6 +33,7 @@ class ContentGenerator:
         if response.choices:
             quote = response.choices[0].message["content"].strip()
             quote_text = re.search(r'"(.*?)"', quote).group(1)
+            insert_quote(quote_text)
             return quote, quote_text
 
         return "", ""
