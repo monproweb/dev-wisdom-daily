@@ -13,7 +13,8 @@ class ContentGenerator:
             {
                 "role": "assistant",
                 "content": "Here are the last 50 quotes that have been generated: "
-                + "\n".join(previous_quotes),
+                + "\n".join(previous_quotes)
+                + ". Please generate a new quote that is different from these previous ones, and ensure equal representation of all domains.",
             },
             {
                 "role": "user",
