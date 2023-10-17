@@ -4,4 +4,5 @@ __pycache__/
 *.pyd
 *.log
 .env
+.env.json
 session.json
