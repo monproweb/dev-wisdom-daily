@@ -6,6 +6,7 @@ from mongo_manager import insert_quote, get_last_50_quotes
 class ContentGenerator:
     def __init__(self, config):
         self.config = config
+        openai.api_key = self.config["OPENAI_API_KEY"]
 
     def generate_quote(self):
         previous_quotes = get_last_50_quotes()

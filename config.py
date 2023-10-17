@@ -22,6 +22,8 @@ def get_config():
         "INSTAGRAM_PASSWORD": os.getenv("INSTAGRAM_PASSWORD"),
         "MONGODB_USERNAME": os.getenv("MONGODB_USERNAME"),
         "MONGODB_PASSWORD": os.getenv("MONGODB_PASSWORD"),
+        "CHALLENGE_EMAIL": os.getenv("CHALLENGE_EMAIL"),
+        "CHALLENGE_PASSWORD": os.getenv("CHALLENGE_PASSWORD"),
     }
 
     return config
