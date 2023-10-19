@@ -67,7 +67,7 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ## 📝 TODO
 
-Try to fix Threads.
+Use [Graph API for Instagram](https://developers.facebook.com/docs/instagram-api/).
 
 ## 📄 License
 
