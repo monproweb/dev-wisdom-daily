@@ -1,22 +1,25 @@
-# 🤖 Developer Quote Threads/Twitter Bot
+# 🤖 Developer Quote Instagram/Twitter Bot
 
-This is a Threads/Twitter bot that generates and thread/tweets developer quotes along with an image based on the description provided by the quote.
+This is a Instagram/Twitter bot that generates and posts/tweets developer quotes along with an image based on the description provided by the quote.
 
 ## 🚀 Technologies Used
 
 - [OpenAI API](https://openai.com/)
-- [threads-net](https://github.com/dmytrostriletskyi/threads-net)
 - [Twitter](https://developer.twitter.com/en/docs/twitter-api)
+- [Instagram](https://developers.facebook.com/docs/instagram-api)
 - [Google Cloud Functions](https://cloud.google.com/functions)
 - [Google Cloud Scheduler](https://cloud.google.com/scheduler)
 - [Google Cloud Pub/Sub](https://cloud.google.com/pubsub)
+- [Google Cloud Storage](https://cloud.google.com/storage)
 - [MongoDB](https://www.mongodb.com/products/platform/cloud)
 - [Python](https://www.python.org/)
 
 ## 📋 Prerequisites
 
 - Python 3.6 or higher
-- A Instagram account without 2FA
+- A Instagram business account
+- A Meta account
+- A Meta page linked to Instagram business account
 - A Twitter Developer account with API keys and access tokens
 - An OpenAI API key
 - A MongoDB database
@@ -35,10 +38,11 @@ To set up this project locally, you will need to:
    - `BEARER_TOKEN`
    - `OPENAI_API_KEY` (Follow the [official documentation](https://platform.openai.com/docs/quickstart) to obtain an OpenAI API key)
    - `TWITTER_ACCOUNT` (Set this to the username of the Twitter account you want to use for posting the tweets, e.g., "@DevWisdomDaily")
-   - `INSTAGRAM_USERNAME` (Set this to the username of the Instagram account you want to use for posting the thread, e.g., "devwisdomdaily")
-   - `INSTAGRAM_PASSWORD`
    - `MONGODB_USERNAME`
    - `MONGODB_PASSWORD`
+   - `FACEBOOK_ACCESS_TOKEN`
+   - `INSTAGRAM_USER_ID`
+   - `GOOGLE_APPLICATION_CREDENTIALS`
 4. Deploy the function to Google Cloud Functions using the following command:
 
     ```shell
@@ -47,7 +51,7 @@ To set up this project locally, you will need to:
     --trigger-resource devwisdomdaily_tweet \
     --trigger-event google.pubsub.topic.publish \
     --entry-point trigger_tweet \
-    --env-vars-file .env
+    --env-vars-file .env.json
     ```
 5. Create a topic in Google Cloud Pub/Sub
 6. Create a subscription for the topic
@@ -55,7 +59,7 @@ To set up this project locally, you will need to:
 
 ## 🎯 Usage
 
-Once the project is set up, the bot will automatically tweet/thread a new developer quote with an image at the specified intervals set up in the Cloud Scheduler job.
+Once the project is set up, the bot will automatically tweet/post a new developer quote with an image at the specified intervals set up in the Cloud Scheduler job.
 
 ## 🤝 Contributing
 
@@ -67,7 +71,7 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ## 📝 TODO
 
-Use [Graph API for Instagram](https://developers.facebook.com/docs/instagram-api/).
+Threads with official Graph API
 
 ## 📄 License
 

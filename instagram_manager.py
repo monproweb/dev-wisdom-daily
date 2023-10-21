@@ -1,151 +1,77 @@
 import os
-import imaplib
-import email
-import re
 import tempfile
 import requests
+from google.cloud import storage
 from PIL import Image
-from instagrapi import Client
-from instagrapi.mixins.challenge import ChallengeChoice
-from instagrapi.exceptions import (
-    BadPassword,
-    ReloginAttemptExceeded,
-    ChallengeRequired,
-    SelectContactPointRecoveryForm,
-    RecaptchaChallengeForm,
-    FeedbackRequired,
-    PleaseWaitFewMinutes,
-    LoginRequired,
-)
 
 
 class InstagramManager:
     def __init__(self, config):
         self.config = config
-        self.client = Client()
-        self.client.challenge_code_handler = self.challenge_code_handler
-        self.client.handle_exception = self.handle_exception
-        self.client.load_settings("session.json")
-        self.client.login(
-            self.config["INSTAGRAM_USERNAME"], self.config["INSTAGRAM_PASSWORD"]
-        )
-        self.client.get_timeline_feed()
+        self.access_token = config.get("FACEBOOK_ACCESS_TOKEN")
+        self.ig_user_id = config.get("INSTAGRAM_USER_ID")
+        self.graph_url = "https://graph.facebook.com/v18.0/"
 
     def post_on_instagram(self, quote, image_url):
         try:
-            with requests.get(image_url, stream=True) as response:
-                response.raise_for_status()
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
+            with Image.open(response.raw) as img:
                 with tempfile.NamedTemporaryFile(
-                    suffix=".png", delete=False
+                    suffix=".jpeg", delete=False
                 ) as temp_file:
-                    for chunk in response.iter_content(1024):
-                        temp_file.write(chunk)
+                    img.convert("RGB").save(temp_file, "JPEG")
                     temp_filename = temp_file.name
 
-            with Image.open(temp_filename) as img:
-                jpeg_filename = temp_filename.replace(".png", ".jpeg")
-                img.convert("RGB").save(jpeg_filename, "JPEG")
+            gcs_filename = self.upload_to_gcs(temp_filename)
+            media = self.publish_to_instagram(gcs_filename, quote)
 
-            media = self.client.photo_upload(jpeg_filename, caption=quote)
+            if media:
+                self.delete_image_from_gcs(gcs_filename)
 
             os.remove(temp_filename)
-            os.remove(jpeg_filename)
 
             return media
         except Exception as e:
             print(f"An error occurred while posting on Instagram: {e}")
             return None
 
-    def challenge_code_handler(self, username, choice):
-        if choice == ChallengeChoice.SMS:
-            # handle SMS case if needed
-            pass
-        elif choice == ChallengeChoice.EMAIL:
-            return self.get_code_from_email(username)
-        return False
+    def upload_to_gcs(self, file_path):
+        storage_client = storage.Client()
+        bucket = storage_client.bucket("devwisdomdaily-image")
+        filename = os.path.basename(file_path)
+        blob = bucket.blob(filename)
+        blob.upload_from_filename(file_path)
+        return f"https://storage.googleapis.com/devwisdomdaily-image/{filename}"
 
-    def get_code_from_email(self, username):
-        mail = imaplib.IMAP4_SSL("imap.gmail.com")
-        mail.login(self.config["CHALLENGE_EMAIL"], self.config["CHALLENGE_PASSWORD"])
-        mail.select("inbox")
-        result, data = mail.search(None, "(UNSEEN)")
-        assert result == "OK", "Error1 during get_code_from_email: %s" % result
-        ids = data.pop().split()
-        for num in reversed(ids):
-            mail.store(num, "+FLAGS", "\\Seen")  # mark as read
-            result, data = mail.fetch(num, "(RFC822)")
-            assert result == "OK", "Error2 during get_code_from_email: %s" % result
-            msg = email.message_from_string(data[0][1].decode())
-            payloads = msg.get_payload()
-            if not isinstance(payloads, list):
-                payloads = [msg]
-            code = None
-            for payload in payloads:
-                body = payload.get_payload(decode=True).decode()
-                if "<div" not in body:
-                    continue
-                match = re.search(">([^>]*?({u})[^<]*?)<".format(u=username), body)
-                if not match:
-                    continue
-                print("Match from email:", match.group(1))
-                match = re.search(r">(\d{6})<", body)
-                if not match:
-                    print('Skip this email, "code" not found')
-                    continue
-                code = match.group(1)
-                if code:
-                    return code
-        return False
+    def publish_to_instagram(self, image_url, caption):
+        url = self.graph_url + self.ig_user_id + "/media"
+        params = {
+            "access_token": self.access_token,
+            "caption": caption,
+            "image_url": image_url,
+        }
+        response = requests.post(url, params=params)
+        if response.ok:
+            media_id = response.json().get("id")
+            return self.publish(media_id)
+        else:
+            print(f"Failed to upload image: {response.text}")
+            return None
 
-    def handle_exception(self, client, e):
-        if isinstance(e, BadPassword):
-            client.logger.exception(e)
-            client.set_proxy(self.next_proxy().href)
-            if client.relogin_attempt > 0:
-                self.freeze(str(e), days=7)
-                raise ReloginAttemptExceeded(e)
-            client.settings = self.rebuild_client_settings()
-            return self.update_client_settings(client.get_settings())
-        elif isinstance(e, LoginRequired):
-            client.logger.exception(e)
-            client.relogin()
-            return self.update_client_settings(client.get_settings())
-        elif isinstance(e, ChallengeRequired):
-            api_path = json_value(client.last_json, "challenge", "api_path")
-            if api_path == "/challenge/":
-                client.set_proxy(self.next_proxy().href)
-                client.settings = self.rebuild_client_settings()
-            else:
-                try:
-                    client.challenge_resolve(client.last_json)
-                except ChallengeRequired as e:
-                    self.freeze("Manual Challenge Required", days=2)
-                    raise e
-                except (
-                    ChallengeRequired,
-                    SelectContactPointRecoveryForm,
-                    RecaptchaChallengeForm,
-                ) as e:
-                    self.freeze(str(e), days=4)
-                    raise e
-                self.update_client_settings(client.get_settings())
-            return True
-        elif isinstance(e, FeedbackRequired):
-            message = client.last_json["feedback_message"]
-            if "This action was blocked. Please try again later" in message:
-                self.freeze(message, hours=12)
-                # client.settings = self.rebuild_client_settings()
-                # return self.update_client_settings(client.get_settings())
-            elif "We restrict certain activity to protect our community" in message:
-                # 6 hours is not enough
-                self.freeze(message, hours=12)
-            elif "Your account has been temporarily blocked" in message:
-                """
-                Based on previous use of this feature, your account has been temporarily
-                blocked from taking this action.
-                This block will expire on 2020-03-27.
-                """
-                self.freeze(message)
-        elif isinstance(e, PleaseWaitFewMinutes):
-            self.freeze(str(e), hours=1)
-        raise e
+    def publish(self, media_id):
+        url = self.graph_url + self.ig_user_id + "/media_publish"
+        params = {"access_token": self.access_token, "creation_id": media_id}
+        response = requests.post(url, params=params)
+        if response.ok:
+            return response.json()
+        else:
+            print(f"Failed to publish image: {response.text}")
+            return None
+
+    def delete_image_from_gcs(self, url):
+        file_name = url.split("/")[-1]
+        storage_client = storage.Client()
+        bucket = storage_client.bucket("devwisdomdaily-image")
+        blob = bucket.blob(file_name)
+        blob.delete()

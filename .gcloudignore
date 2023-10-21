@@ -15,4 +15,4 @@
 
 node_modules
 #!include:.gitignore
-!session.json
+!dev-wisdom-daily-7bffca4fe081.json

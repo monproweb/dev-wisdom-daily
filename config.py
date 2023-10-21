@@ -18,12 +18,10 @@ def get_config():
         "TWITTER_ACCESS_TOKEN": os.getenv("TWITTER_ACCESS_TOKEN"),
         "TWITTER_ACCESS_TOKEN_SECRET": os.getenv("TWITTER_ACCESS_TOKEN_SECRET"),
         "TWITTER_BEARER_TOKEN": os.getenv("TWITTER_BEARER_TOKEN"),
-        "INSTAGRAM_USERNAME": os.getenv("INSTAGRAM_USERNAME"),
-        "INSTAGRAM_PASSWORD": os.getenv("INSTAGRAM_PASSWORD"),
         "MONGODB_USERNAME": os.getenv("MONGODB_USERNAME"),
         "MONGODB_PASSWORD": os.getenv("MONGODB_PASSWORD"),
-        "CHALLENGE_EMAIL": os.getenv("CHALLENGE_EMAIL"),
-        "CHALLENGE_PASSWORD": os.getenv("CHALLENGE_PASSWORD"),
+        "FACEBOOK_ACCESS_TOKEN": os.getenv("FACEBOOK_ACCESS_TOKEN"),
+        "INSTAGRAM_USER_ID": os.getenv("INSTAGRAM_USER_ID"),
     }
 
     return config
