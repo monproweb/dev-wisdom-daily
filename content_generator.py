@@ -1,12 +1,13 @@
 import re
-import openai
+from openai import OpenAI
 from mongo_manager import insert_quote, get_last_50_quotes
+
+client = OpenAI()
 
 
 class ContentGenerator:
     def __init__(self, config):
         self.config = config
-        openai.api_key = self.config["OPENAI_API_KEY"]
 
     def generate_quote(self):
         previous_quotes = get_last_50_quotes()
@@ -23,8 +24,8 @@ class ContentGenerator:
             },
         ]
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4-1106-preview",
             messages=chat_messages,
             n=1,
             stop=None,
@@ -33,7 +34,7 @@ class ContentGenerator:
         )
 
         if response.choices:
-            quote = response.choices[0].message["content"].strip()
+            quote = response.choices[0].message.content.strip()
             quote_text = re.search(r'"(.*?)"', quote).group(1)
             insert_quote(quote_text)
             return quote, quote_text
@@ -48,8 +49,8 @@ class ContentGenerator:
             },
         ]
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4-1106-preview",
             messages=chat_messages,
             n=1,
             stop=None,
@@ -57,16 +58,17 @@ class ContentGenerator:
             max_tokens=150,
         )
 
-        detailed_description = response.choices[0].message["content"].strip()
+        detailed_description = response.choices[0].message.content.strip()
         return detailed_description
 
     def generate_image(self, prompt):
-        response = openai.Image.create(
+        response = client.images.generate(
+            model="dall-e-3",
             prompt=prompt,
-            n=1,
             size="1024x1024",
-            response_format="url",
+            quality="standard",
+            n=1,
         )
 
-        image_url = response.data[0]["url"]
+        image_url = response.data[0].url
         return image_url
