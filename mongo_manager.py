@@ -22,8 +22,9 @@ quotes_collection = db["quotes"]
 def insert_quote(quote_text):
     quotes_collection.insert_one({"quote": quote_text})
     quotes_count = quotes_collection.count_documents({})
+
     if quotes_count > 50:
-        oldest_quote = quotes_collection.find_one(sort=[("quote", 1)])
+        oldest_quote = quotes_collection.find_one(sort=[("_id", 1)])
         quotes_collection.delete_one({"_id": oldest_quote["_id"]})
 
 
